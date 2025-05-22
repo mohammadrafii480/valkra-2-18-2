@@ -219,6 +219,8 @@ public class PublishProfilePictureActivity extends XmppActivity
         this.support =
                 this.account.getXmppConnection() != null
                         && this.account.getXmppConnection().getFeatures().pep();
+
+        Log.d("reloadAvatar","this.support = "+this.support);
         if (this.avatarUri == null) {
             if (this.account.getAvatar() != null || this.defaultUri == null) {
                 loadImageIntoPreview(null);

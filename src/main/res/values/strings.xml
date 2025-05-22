@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="action_settings">Settings</string>
-    <string name="action_accounts">Manage accounts</string>
+    <string name="action_accounts">Manage account</string>
     <string name="action_account">Manage account</string>
     <string name="action_archive_chat">Archive chat</string>
     <string name="action_contact_details">Contact details</string>
@@ -17,7 +17,7 @@
     <string name="action_unblock_domain">Unblock domain</string>
     <string name="action_block_participant">Block participant</string>
     <string name="action_unblock_participant">Unblock participant</string>
-    <string name="title_activity_manage_accounts">Manage Accounts</string>
+    <string name="title_activity_manage_accounts">Manage Account</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_share_with">Share with…</string>
     <string name="title_activity_choose_contact">Choose Contact</string>
@@ -186,7 +186,7 @@
     <string name="mgmt_account_enable">Enable account</string>
     <string name="mgmt_account_delete_confirm_text">Are you sure you want to delete your account? Deleting your account erases your entire chat history</string>
     <string name="attach_record_voice">Record voice</string>
-    <string name="account_settings_jabber_id">XMPP address</string>
+    <string name="account_settings_jabber_id">Email</string>
     <string name="block_jabber_id">Block XMPP address</string>
     <string name="account_settings_example_jabber_id">username@example.com</string>
     <string name="password">Password</string>
@@ -895,8 +895,8 @@
     <string name="search_channels">Search channels</string>
     <string name="channel_discovery_opt_in_title">Possible privacy violation!</string>
     <string name="channel_discover_opt_in_message">Channel discovery uses a third party service called &lt;a href=&quot;https://search.jabber.network&quot;>search.jabber.network&lt;/a>.&lt;br>&lt;br>Using this feature will transmit your IP address and search terms to that service. See their &lt;a href=&quot;https://search.jabber.network/privacy&quot;>Privacy Policy&lt;/a> for more information.</string>
-    <string name="i_already_have_an_account">I already have an account</string>
-    <string name="add_existing_account">Add existing account</string>
+    <string name="i_already_have_an_account">Login</string>
+    <string name="add_existing_account">Login existing account</string>
     <string name="register_new_account">Register new account</string>
     <string name="this_looks_like_a_domain">This looks like a domain address</string>
     <string name="add_anway">Add anyway</string>
@@ -1040,7 +1040,7 @@
     <string name="start_chat">Start chat</string>
     <string name="no_certificate_selected">No client certificate selected!</string>
     <string name="pref_title_interface">Interface</string>
-    <string name="pref_summary_appearance">Theme, Colors, Screenshots, Input</string>
+    <string name="pref_summary_appearance">Colors, Screenshots, Input</string>
     <string name="pref_title_security">Security</string>
     <string name="pref_summary_security">E2E Encryption, Blind Trust Before Verification, MITM Detection</string>
     <string name="unified_push_summary">Notification relay for UnifiedPush compatible third party apps</string>

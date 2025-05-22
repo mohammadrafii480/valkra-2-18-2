@@ -151,11 +151,11 @@ public class ManageAccountActivity extends XmppActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.manageaccounts, menu);
         MenuItem enableAll = menu.findItem(R.id.action_enable_all);
-        MenuItem addAccount = menu.findItem(R.id.action_add_account);
+//        MenuItem addAccount = menu.findItem(R.id.action_add_account);
         MenuItem addAccountWithCertificate = menu.findItem(R.id.action_add_account_with_cert);
 
         if (Config.X509_VERIFICATION) {
-            addAccount.setVisible(false);
+//            addAccount.setVisible(false);
             addAccountWithCertificate.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
@@ -204,9 +204,9 @@ public class ManageAccountActivity extends XmppActivity
             return false;
         }
         switch (item.getItemId()) {
-            case R.id.action_add_account:
-                startActivity(new Intent(this, EditAccountActivity.class));
-                break;
+//            case R.id.action_add_account:
+//                startActivity(new Intent(this, EditAccountActivity.class));
+//                break;
             case R.id.action_import_backup:
                 if (hasStoragePermission(REQUEST_IMPORT_BACKUP)) {
                     startActivity(new Intent(this, ImportBackupActivity.class));

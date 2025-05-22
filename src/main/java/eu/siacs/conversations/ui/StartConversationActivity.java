@@ -360,23 +360,23 @@ public class StartConversationActivity extends XmppActivity
                         prefilled = null;
                     }
                     switch (actionItem.getId()) {
-                        case R.id.discover_public_channels:
-                            if (QuickConversationsService.isPlayStoreFlavor()) {
-                                throw new IllegalStateException(
-                                        "Channel discovery is not available on Google Play flavor");
-                            } else {
-                                startActivity(new Intent(this, ChannelDiscoveryActivity.class));
-                            }
-                            break;
-                        case R.id.join_public_channel:
-                            showJoinConferenceDialog(prefilled);
-                            break;
+//                        case R.id.discover_public_channels:
+//                            if (QuickConversationsService.isPlayStoreFlavor()) {
+//                                throw new IllegalStateException(
+//                                        "Channel discovery is not available on Google Play flavor");
+//                            } else {
+//                                startActivity(new Intent(this, ChannelDiscoveryActivity.class));
+//                            }
+//                            break;
+//                        case R.id.join_public_channel:
+//                            showJoinConferenceDialog(prefilled);
+//                            break;
                         case R.id.create_private_group_chat:
                             showCreatePrivateGroupChatDialog();
                             break;
-                        case R.id.create_public_channel:
-                            showPublicChannelDialog();
-                            break;
+//                        case R.id.create_public_channel:
+//                            showPublicChannelDialog();
+//                            break;
                         case R.id.create_contact:
                             showCreateContactDialog(prefilled, null);
                             break;
@@ -392,10 +392,9 @@ public class StartConversationActivity extends XmppActivity
         final Menu menu = popupMenu.getMenu();
         for (int i = 0; i < menu.size(); i++) {
             final MenuItem menuItem = menu.getItem(i);
-            if (QuickConversationsService.isPlayStoreFlavor()
-                    && menuItem.getItemId() == R.id.discover_public_channels) {
-                continue;
-            }
+//            if (QuickConversationsService.isPlayStoreFlavor() && menuItem.getItemId() == R.id.discover_public_channels) {
+//                continue;
+//            }
             final SpeedDialActionItem actionItem =
                     new SpeedDialActionItem.Builder(menuItem.getItemId(), menuItem.getIcon())
                             .setLabel(

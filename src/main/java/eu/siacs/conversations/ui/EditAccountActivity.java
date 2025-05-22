@@ -1,5 +1,8 @@
 package eu.siacs.conversations.ui;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
@@ -162,8 +165,7 @@ public class EditAccountActivity extends OmemoActivity
                 @Override
                 public void onClick(final View v) {
                     final String password = binding.accountPassword.getText().toString();
-                    final boolean wasDisabled =
-                            mAccount != null && mAccount.getStatus() == Account.State.DISABLED;
+                    final boolean wasDisabled = mAccount != null && mAccount.getStatus() == Account.State.DISABLED;
                     final boolean accountInfoEdited = accountInfoEdited();
 
                     if (mInitMode && mAccount != null) {
@@ -188,9 +190,7 @@ public class EditAccountActivity extends OmemoActivity
                     if (mForceRegister != null) {
                         registerNewAccount = mForceRegister;
                     } else {
-                        registerNewAccount =
-                                binding.accountRegisterNew.isChecked()
-                                        && !Config.DISALLOW_REGISTRATION_IN_UI;
+                        registerNewAccount = binding.accountRegisterNew.isChecked() && !Config.DISALLOW_REGISTRATION_IN_UI;
                     }
                     if (mUsernameMode && binding.accountJid.getText().toString().contains("@")) {
                         binding.accountJidLayout.setError(getString(R.string.invalid_username));
@@ -611,15 +611,10 @@ public class EditAccountActivity extends OmemoActivity
         if (accountInfoEdited && !mInitMode) {
             this.binding.saveButton.setText(R.string.save);
             this.binding.saveButton.setEnabled(true);
-        } else if (mAccount != null
-                && (mAccount.getStatus() == Account.State.CONNECTING
-                        || mAccount.getStatus() == Account.State.REGISTRATION_SUCCESSFUL
-                        || mFetchingAvatar)) {
+        } else if (mAccount != null && (mAccount.getStatus() == Account.State.CONNECTING || mAccount.getStatus() == Account.State.REGISTRATION_SUCCESSFUL || mFetchingAvatar)) {
             this.binding.saveButton.setEnabled(false);
             this.binding.saveButton.setText(R.string.account_status_connecting);
-        } else if (mAccount != null
-                && mAccount.getStatus() == Account.State.DISABLED
-                && !mInitMode) {
+        } else if (mAccount != null && mAccount.getStatus() == Account.State.DISABLED && !mInitMode) {
             this.binding.saveButton.setEnabled(true);
             this.binding.saveButton.setText(R.string.enable);
         } else if (torNeedsInstall(mAccount)) {
@@ -629,14 +624,24 @@ public class EditAccountActivity extends OmemoActivity
             this.binding.saveButton.setEnabled(true);
             this.binding.saveButton.setText(R.string.start_orbot);
         } else {
-            this.binding.saveButton.setEnabled(true);
+            Log.d("CEK","MASUK SINI | mForceRegister = "+mForceRegister);
+            String xmppAddress = this.binding.accountJid.getText().toString().trim();
+            String passwordUser = this.binding.accountPassword.getText().toString();
+            if (xmppAddress.isEmpty() && passwordUser.isEmpty()){
+                this.binding.saveButton.setEnabled(false);
+            }
+            else {
+                this.binding.saveButton.setEnabled(true);
+            }
+
             if (!mInitMode) {
                 if (mAccount != null && mAccount.isOnlineAndConnected()) {
                     this.binding.saveButton.setText(R.string.save);
                     if (!accountInfoEdited) {
                         this.binding.saveButton.setEnabled(false);
                     }
-                } else {
+                }
+                else {
                     XmppConnection connection =
                             mAccount == null ? null : mAccount.getXmppConnection();
                     HttpUrl url =
@@ -741,7 +746,7 @@ public class EditAccountActivity extends OmemoActivity
                 (buttonView, isChecked) -> updateSaveButton();
         this.binding.accountRegisterNew.setOnCheckedChangeListener(OnCheckedShowConfirmPassword);
         if (Config.DISALLOW_REGISTRATION_IN_UI) {
-            this.binding.accountRegisterNew.setVisibility(View.GONE);
+            this.binding.accountRegisterNew.setVisibility(GONE);
         }
         this.binding.actionEditYourName.setOnClickListener(this::onEditYourNameClicked);
         this.binding.scanButton.setOnClickListener((v) -> ScanActivity.scan(this));
@@ -809,7 +814,7 @@ public class EditAccountActivity extends OmemoActivity
     public boolean onPrepareOptionsMenu(Menu menu) {
         final MenuItem showMoreInfo = menu.findItem(R.id.action_server_info_show_more);
         if (showMoreInfo.isVisible()) {
-            showMoreInfo.setChecked(binding.serverInfoMore.getVisibility() == View.VISIBLE);
+            showMoreInfo.setChecked(binding.serverInfoMore.getVisibility() == VISIBLE);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -850,11 +855,11 @@ public class EditAccountActivity extends OmemoActivity
             this.mInitMode = init || this.jidToEdit == null;
             this.messageFingerprint = intent.getStringExtra("fingerprint");
             if (!mInitMode) {
-                this.binding.accountRegisterNew.setVisibility(View.GONE);
+                this.binding.accountRegisterNew.setVisibility(GONE);
                 setTitle(getString(R.string.account_details));
                 configureActionBar(getSupportActionBar(), !openedFromNotification);
             } else {
-                this.binding.avater.setVisibility(View.GONE);
+                this.binding.avater.setVisibility(GONE);
                 configureActionBar(
                         getSupportActionBar(), !(init && Config.MAGIC_CREATE_DOMAIN == null));
                 if (mForceRegister != null) {
@@ -879,9 +884,9 @@ public class EditAccountActivity extends OmemoActivity
                                 && preferences.getBoolean(
                                         "show_connection_options",
                                         getResources().getBoolean(R.bool.show_connection_options)));
-        this.binding.namePort.setVisibility(mShowOptions ? View.VISIBLE : View.GONE);
+        this.binding.namePort.setVisibility(mShowOptions ? VISIBLE : GONE);
         if (mForceRegister != null) {
-            this.binding.accountRegisterNew.setVisibility(View.GONE);
+            this.binding.accountRegisterNew.setVisibility(GONE);
         }
     }
 
@@ -928,7 +933,7 @@ public class EditAccountActivity extends OmemoActivity
             savedInstanceState.putString("account", mAccount.getJid().asBareJid().toString());
             savedInstanceState.putBoolean("initMode", mInitMode);
             savedInstanceState.putBoolean(
-                    "showMoreTable", binding.serverInfoMore.getVisibility() == View.VISIBLE);
+                    "showMoreTable", binding.serverInfoMore.getVisibility() == VISIBLE);
         }
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -1058,8 +1063,8 @@ public class EditAccountActivity extends OmemoActivity
     }
 
     private void changeMoreTableVisibility(final boolean visible) {
-        binding.serverInfoMore.setVisibility(visible ? View.VISIBLE : View.GONE);
-        binding.serverInfoLoginMechanism.setVisibility(visible ? View.VISIBLE : View.GONE);
+        binding.serverInfoMore.setVisibility(visible ? VISIBLE : GONE);
+        binding.serverInfoLoginMechanism.setVisibility(visible ? VISIBLE : GONE);
     }
 
     private void gotoChangePassword() {
@@ -1086,7 +1091,7 @@ public class EditAccountActivity extends OmemoActivity
             binding.statusMessage.append(current);
         }
         setAvailabilityRadioButton(mAccount.getPresenceStatus(), binding);
-        binding.show.setVisibility(manualStatus ? View.VISIBLE : View.GONE);
+        binding.show.setVisibility(manualStatus ? VISIBLE : GONE);
         List<PresenceTemplate> templates = xmppConnectionService.getPresenceTemplates(mAccount);
         PresenceTemplateAdapter presenceTemplateAdapter =
                 new PresenceTemplateAdapter(this, R.layout.item_autocomplete, templates);
@@ -1174,7 +1179,7 @@ public class EditAccountActivity extends OmemoActivity
             this.binding.hostname.getEditableText().append(this.mAccount.getHostname());
             this.binding.port.setText("");
             this.binding.port.getEditableText().append(String.valueOf(this.mAccount.getPort()));
-            this.binding.namePort.setVisibility(mShowOptions ? View.VISIBLE : View.GONE);
+            this.binding.namePort.setVisibility(mShowOptions ? VISIBLE : GONE);
         }
 
         final boolean editable =
@@ -1205,11 +1210,11 @@ public class EditAccountActivity extends OmemoActivity
         this.binding.accountPassword.setEnabled(editPassword);
 
         if (!mInitMode) {
-            this.binding.avater.setVisibility(View.VISIBLE);
+            this.binding.avater.setVisibility(VISIBLE);
             AvatarWorkerTask.loadAvatar(
                     mAccount, binding.avater, R.dimen.avatar_on_details_screen_size);
         } else {
-            this.binding.avater.setVisibility(View.GONE);
+            this.binding.avater.setVisibility(GONE);
         }
         this.binding.accountRegisterNew.setChecked(
                 this.mAccount.isOptionSet(Account.OPTION_REGISTER));
@@ -1220,16 +1225,16 @@ public class EditAccountActivity extends OmemoActivity
                     actionBar.setTitle(R.string.create_account);
                 }
             }
-            this.binding.accountRegisterNew.setVisibility(View.GONE);
+            this.binding.accountRegisterNew.setVisibility(GONE);
         } else if (this.mAccount.isOptionSet(Account.OPTION_REGISTER) && mForceRegister == null) {
-            this.binding.accountRegisterNew.setVisibility(View.VISIBLE);
+            this.binding.accountRegisterNew.setVisibility(VISIBLE);
         } else {
-            this.binding.accountRegisterNew.setVisibility(View.GONE);
+            this.binding.accountRegisterNew.setVisibility(GONE);
         }
         if (this.mAccount.isOnlineAndConnected() && !this.mFetchingAvatar) {
             final var connection = this.mAccount.getXmppConnection();
             final Features features = connection.getFeatures();
-            this.binding.stats.setVisibility(View.VISIBLE);
+            this.binding.stats.setVisibility(VISIBLE);
             boolean showBatteryWarning = isOptimizingBattery();
             boolean showDataSaverWarning = isAffectedByDataSaver();
             showOsOptimizationWarning(showBatteryWarning, showDataSaverWarning);
@@ -1308,8 +1313,8 @@ public class EditAccountActivity extends OmemoActivity
 
             this.binding.pushRow.setVisibility(
                     xmppConnectionService.getPushManagementService().isStub()
-                            ? View.GONE
-                            : View.VISIBLE);
+                            ? GONE
+                            : VISIBLE);
 
             if (xmppConnectionService.getPushManagementService().available(mAccount)) {
                 this.binding.serverInfoPush.setText(R.string.server_info_available);
@@ -1320,7 +1325,7 @@ public class EditAccountActivity extends OmemoActivity
             if (pgpKeyId != 0 && Config.supportOpenPgp()) {
                 OnClickListener openPgp = view -> launchOpenKeyChain(pgpKeyId);
                 OnClickListener delete = view -> showDeletePgpDialog();
-                this.binding.pgpFingerprintBox.setVisibility(View.VISIBLE);
+                this.binding.pgpFingerprintBox.setVisibility(VISIBLE);
                 this.binding.pgpFingerprint.setText(OpenPgpUtils.convertKeyIdToHex(pgpKeyId));
                 this.binding.pgpFingerprint.setOnClickListener(openPgp);
                 if ("pgp".equals(messageFingerprint)) {
@@ -1332,12 +1337,12 @@ public class EditAccountActivity extends OmemoActivity
                 this.binding.pgpFingerprintDesc.setOnClickListener(openPgp);
                 this.binding.actionDeletePgp.setOnClickListener(delete);
             } else {
-                this.binding.pgpFingerprintBox.setVisibility(View.GONE);
+                this.binding.pgpFingerprintBox.setVisibility(GONE);
             }
             final String ownAxolotlFingerprint =
                     this.mAccount.getAxolotlService().getOwnFingerprint();
             if (ownAxolotlFingerprint != null && Config.supportOmemo()) {
-                this.binding.axolotlFingerprintBox.setVisibility(View.VISIBLE);
+                this.binding.axolotlFingerprintBox.setVisibility(VISIBLE);
                 this.binding.axolotlFingerprintBox.setOnCreateContextMenuListener(
                         (menu, v, menuInfo) -> {
                             getMenuInflater().inflate(R.menu.omemo_key_context, menu);
@@ -1361,10 +1366,10 @@ public class EditAccountActivity extends OmemoActivity
                 }
                 this.binding.axolotlFingerprint.setText(
                         CryptoHelper.prettifyFingerprint(ownAxolotlFingerprint.substring(2)));
-                this.binding.showQrCodeButton.setVisibility(View.VISIBLE);
+                this.binding.showQrCodeButton.setVisibility(VISIBLE);
                 this.binding.showQrCodeButton.setOnClickListener(v -> showQrCode());
             } else {
-                this.binding.axolotlFingerprintBox.setVisibility(View.GONE);
+                this.binding.axolotlFingerprintBox.setVisibility(GONE);
             }
             boolean hasKeys = false;
             boolean showUnverifiedWarning = false;
@@ -1385,20 +1390,20 @@ public class EditAccountActivity extends OmemoActivity
                     && Config.supportOmemo()) { // TODO: either the button should be visible if we
                 // print an active device or the device list should
                 // be fed with reactivated devices
-                this.binding.otherDeviceKeysCard.setVisibility(View.VISIBLE);
+                this.binding.otherDeviceKeysCard.setVisibility(VISIBLE);
                 Set<Integer> otherDevices = mAccount.getAxolotlService().getOwnDeviceIds();
                 if (otherDevices == null || otherDevices.isEmpty()) {
-                    binding.clearDevices.setVisibility(View.GONE);
+                    binding.clearDevices.setVisibility(GONE);
                 } else {
-                    binding.clearDevices.setVisibility(View.VISIBLE);
+                    binding.clearDevices.setVisibility(VISIBLE);
                 }
                 binding.unverifiedWarning.setVisibility(
-                        showUnverifiedWarning ? View.VISIBLE : View.GONE);
-                binding.scanButton.setVisibility(showUnverifiedWarning ? View.VISIBLE : View.GONE);
+                        showUnverifiedWarning ? VISIBLE : GONE);
+                binding.scanButton.setVisibility(showUnverifiedWarning ? VISIBLE : GONE);
             } else {
-                this.binding.otherDeviceKeysCard.setVisibility(View.GONE);
+                this.binding.otherDeviceKeysCard.setVisibility(GONE);
             }
-            this.binding.serviceOutage.setVisibility(View.GONE);
+            this.binding.serviceOutage.setVisibility(GONE);
         } else {
             final TextInputLayout errorLayout;
             final var status = this.mAccount.getStatus();
@@ -1425,11 +1430,11 @@ public class EditAccountActivity extends OmemoActivity
                 errorLayout = null;
             }
             removeErrorsOnAllBut(errorLayout);
-            this.binding.stats.setVisibility(View.GONE);
-            this.binding.otherDeviceKeysCard.setVisibility(View.GONE);
+            this.binding.stats.setVisibility(GONE);
+            this.binding.otherDeviceKeysCard.setVisibility(GONE);
             final var sos = mAccount.getServiceOutageStatus();
             if (mAccount.isServiceOutage() && sos != null) {
-                this.binding.serviceOutage.setVisibility(View.VISIBLE);
+                this.binding.serviceOutage.setVisibility(VISIBLE);
                 if (sos.isPlanned()) {
                     this.binding.sosTitle.setText(R.string.account_status_service_outage_scheduled);
                 } else {
@@ -1437,20 +1442,20 @@ public class EditAccountActivity extends OmemoActivity
                 }
                 final var sosMessage = sos.getMessage();
                 if (Strings.isNullOrEmpty(sosMessage)) {
-                    this.binding.sosMessage.setVisibility(View.GONE);
+                    this.binding.sosMessage.setVisibility(GONE);
                 } else {
                     final var sosMessageSpannable = new SpannableString(sosMessage);
                     Linkify.addLinks(sosMessageSpannable);
                     FixedURLSpan.fix(sosMessageSpannable);
                     this.binding.sosMessage.setText(sosMessageSpannable);
-                    this.binding.sosMessage.setVisibility(View.VISIBLE);
+                    this.binding.sosMessage.setVisibility(VISIBLE);
                     this.binding.sosMessage.setMovementMethod(LinkMovementMethod.getInstance());
                 }
                 final var expectedEnd = sos.getExpectedEnd();
                 if (expectedEnd <= 0) {
-                    this.binding.sosScheduledEnd.setVisibility(View.GONE);
+                    this.binding.sosScheduledEnd.setVisibility(GONE);
                 } else {
-                    this.binding.sosScheduledEnd.setVisibility(View.VISIBLE);
+                    this.binding.sosScheduledEnd.setVisibility(VISIBLE);
                     this.binding.sosScheduledEnd.setText(
                             getString(
                                     R.string.sos_scheduled_return,
@@ -1463,7 +1468,7 @@ public class EditAccountActivity extends OmemoActivity
                                                     | DateUtils.FORMAT_SHOW_DATE)));
                 }
             } else {
-                this.binding.serviceOutage.setVisibility(View.GONE);
+                this.binding.serviceOutage.setVisibility(GONE);
             }
         }
     }
@@ -1523,7 +1528,7 @@ public class EditAccountActivity extends OmemoActivity
     private void showOsOptimizationWarning(
             boolean showBatteryWarning, boolean showDataSaverWarning) {
         this.binding.osOptimization.setVisibility(
-                showBatteryWarning || showDataSaverWarning ? View.VISIBLE : View.GONE);
+                showBatteryWarning || showDataSaverWarning ? VISIBLE : GONE);
         if (showDataSaverWarning
                 && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             this.binding.osOptimizationHeadline.setText(R.string.data_saver_enabled);
