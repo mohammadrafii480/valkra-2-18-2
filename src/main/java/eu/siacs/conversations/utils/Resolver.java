@@ -45,6 +45,8 @@ import org.minidns.record.Record;
 import org.minidns.record.SRV;
 
 public class Resolver {
+    public static final int DEFAULT_PORT_XMPP = 5222;
+
 
     private static final Comparator<Result> RESULT_COMPARATOR =
             (left, right) -> {

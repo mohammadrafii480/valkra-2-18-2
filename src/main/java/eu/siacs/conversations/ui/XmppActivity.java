@@ -196,6 +196,7 @@ public abstract class XmppActivity extends ActionBarActivity {
         toast.cancel();
     }
 
+
     protected void replaceToast(String msg) {
         replaceToast(msg, true);
     }

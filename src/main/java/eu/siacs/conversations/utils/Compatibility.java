@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -29,8 +30,27 @@ public class Compatibility {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
     }
 
+    private static boolean targetsTwentySix(Context context) {
+        try {
+            final PackageManager packageManager = context.getPackageManager();
+            final ApplicationInfo applicationInfo =
+                    packageManager.getApplicationInfo(context.getPackageName(), 0);
+            return applicationInfo == null || applicationInfo.targetSdkVersion >= 26;
+        } catch (PackageManager.NameNotFoundException | RuntimeException e) {
+            return true; // when in doubt…
+        }
+    }
+
     public static boolean twentySix() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    }
+
+    public static boolean runsTwentySix() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    }
+
+    public static boolean runsAndTargetsTwentySix(Context context) {
+        return runsTwentySix() && targetsTwentySix(context);
     }
 
     public static boolean twentyEight() {

@@ -121,7 +121,7 @@ public class Account extends AbstractEntity implements AvatarService.Avatarable 
                 null,
                 null,
                 null,
-                Resolver.XMPP_PORT_STARTTLS,
+                5222,
                 im.conversations.android.xmpp.model.stanza.Presence.Availability.ONLINE,
                 null,
                 null,

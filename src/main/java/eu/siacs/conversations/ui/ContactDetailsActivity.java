@@ -615,7 +615,7 @@ public class ContactDetailsActivity extends OmemoActivity
                                 MaterialColors.harmonizeWithPrimary(
                                         tv.getContext(),
                                         ContextCompat.getColor(
-                                                tv.getContext(), R.color.gray_800))));
+                                                tv.getContext(), R.color.grey800))));
                 final int id = ViewCompat.generateViewId();
                 tv.setId(id);
                 viewIdBuilder.add(id);

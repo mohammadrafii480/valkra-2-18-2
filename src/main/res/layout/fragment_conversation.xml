@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/dark_grey_seliso">
 
         <ListView
             android:id="@+id/messages_view"
@@ -12,116 +14,118 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/snackbar"
             android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:background="@color/dark_grey_seliso"
             android:divider="@null"
             android:dividerHeight="0dp"
             android:listSelector="@android:color/transparent"
             android:stackFromBottom="true"
             android:transcriptMode="normal"
-            tools:listitem="@layout/item_message_end" />
+            tools:listitem="@layout/message_sent"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/scroll_to_bottom_button"
-            style="?attr/floatingActionButtonSmallSurfaceStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/messages_view"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_keyboard_double_arrow_down_24dp"
-            android:visibility="visible"
+            android:layout_alignParentRight="true"
+            android:alpha="0.85"
+            android:src="?attr/icon_scroll_down"
+            android:visibility="gone"
+            app:backgroundTint="?attr/color_background_primary"
+            app:fabSize="mini"
             app:useCompatPadding="true" />
 
         <eu.siacs.conversations.ui.widget.UnreadCountCustomView
             android:id="@+id/unread_count_custom_view"
-            android:layout_width="18sp"
-            android:layout_height="18sp"
+            android:layout_width="?attr/IconSize"
+            android:layout_height="?attr/IconSize"
             android:layout_alignTop="@+id/scroll_to_bottom_button"
             android:layout_alignEnd="@+id/scroll_to_bottom_button"
+            android:layout_alignRight="@+id/scroll_to_bottom_button"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:elevation="8dp"
             android:visibility="gone"
-            app:backgroundColor="?colorTertiaryContainer"
-            app:textColor="?colorOnTertiaryContainer"
+            app:backgroundColor="?attr/unread_count"
             tools:ignore="RtlCompat" />
 
         <RelativeLayout
             android:id="@+id/textsend"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="6dp">
+            android:background="?attr/color_background_primary">
 
             <LinearLayout
-                android:id="@+id/input_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
                 android:layout_toStartOf="@+id/textSendButton"
-                android:background="@drawable/background_message_bubble"
-                android:backgroundTint="?colorTertiaryContainer"
-                android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp">
+                android:layout_toLeftOf="@+id/textSendButton"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/text_input_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8sp"
+                    android:layout_marginTop="8dp"
                     android:maxLines="1"
-                    android:textAppearance="?textAppearanceBodySmall"
-                    android:textColor="?colorOnTertiaryContainer"
-                    android:visibility="visible"
-                    tools:text="@string/private_message_to" />
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:visibility="gone" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/media_preview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:paddingTop="8dp"
                     android:requiresFadingEdge="horizontal"
                     android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_media_preview">
+                    tools:listitem="@layout/media_preview">
 
                 </androidx.recyclerview.widget.RecyclerView>
 
                 <eu.siacs.conversations.ui.widget.EditMessage
                     android:id="@+id/textinput"
+                    style="@style/Widget.Conversations.EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
+                    android:background="?attr/color_background_primary"
                     android:ems="10"
                     android:imeOptions="flagNoExtractUi|actionSend"
                     android:inputType="textShortMessage|textMultiLine|textCapSentences"
                     android:maxLines="8"
-                    android:minHeight="32dp"
+                    android:minHeight="48dp"
                     android:minLines="1"
-                    android:textColor="?colorOnTertiaryContainer"
-                    android:textColorHint="@color/hint_on_tertiary_container"
-                    android:textCursorDrawable="@drawable/cursor_on_tertiary_container">
+                    android:textColorHint="#C3C3C3"
+                    android:textCursorDrawable="@drawable/color_cursor"
+                    android:padding="8dp"
+                    android:textColor="@color/black">
 
                     <requestFocus />
                 </eu.siacs.conversations.ui.widget.EditMessage>
 
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
+            <ImageButton
                 android:id="@+id/textSendButton"
-                style="?attr/materialIconButtonFilledTonalStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:backgroundTint="?colorSurfaceContainerHigh"
+                android:background="?attr/color_background_primary"
                 android:contentDescription="@string/send_message"
-                app:icon="@drawable/ic_send_24dp"
-                app:iconSize="32dp" />
+                android:src="?attr/ic_send_text_offline" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -134,33 +138,33 @@
             android:layout_marginBottom="4dp"
             android:background="@drawable/snackbar"
             android:minHeight="48dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/snackbar_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="24dp"
                 android:layout_toStartOf="@+id/snackbar_action"
-                android:textColor="?colorOnSurfaceInverse"
-                tools:text="@string/conference_kicked" />
+                android:layout_toLeftOf="@+id/snackbar_action"
+                android:paddingStart="24dp"
+                android:paddingLeft="24dp"/>
 
             <TextView
                 android:id="@+id/snackbar_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:paddingLeft="24dp"
                 android:paddingTop="16dp"
                 android:paddingRight="24dp"
                 android:paddingBottom="16dp"
                 android:textAllCaps="true"
-                android:textColor="?colorOnSurfaceInverse"
-                android:textStyle="bold"
-                tools:text="@string/leave" />
+                android:textStyle="bold" />
         </RelativeLayout>
 
     </RelativeLayout>

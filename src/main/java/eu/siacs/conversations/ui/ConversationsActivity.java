@@ -56,6 +56,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
+
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import eu.siacs.conversations.Config;
 import eu.siacs.conversations.R;
@@ -661,7 +663,7 @@ public class ConversationsActivity extends XmppActivity
                 actionBar.setTitle(conversation.getName());
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 ToolbarUtils.setActionBarOnClickListener(
-                        binding.toolbar, (v) -> openConversationDetails(conversation));
+                        (MaterialToolbar) binding.toolbar, (v) -> openConversationDetails(conversation));
                 return;
             }
         }
@@ -678,7 +680,7 @@ public class ConversationsActivity extends XmppActivity
             actionBar.setTitle(R.string.app_name);
         }
         actionBar.setDisplayHomeAsUpEnabled(false);
-        ToolbarUtils.resetActionBarOnClickListeners(binding.toolbar);
+        ToolbarUtils.resetActionBarOnClickListeners((MaterialToolbar) binding.toolbar);
     }
 
     private void openConversationDetails(final Conversation conversation) {

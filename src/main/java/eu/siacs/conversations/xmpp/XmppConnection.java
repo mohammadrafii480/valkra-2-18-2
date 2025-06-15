@@ -3269,5 +3269,9 @@ public class XmppConnection implements Runnable {
         public boolean mdsServerAssist() {
             return hasDiscoFeature(account.getJid().asBareJid(), Namespace.MDS_DISPLAYED);
         }
+
+        public boolean carbons() {
+            return hasDiscoFeature(account.getDomain(), Namespace.CARBONS);
+        }
     }
 }

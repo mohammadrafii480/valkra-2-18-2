@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
+        android:background="@color/dark_grey_seliso"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
@@ -36,17 +37,20 @@
         </LinearLayout>
 
         <com.google.android.material.appbar.AppBarLayout
+            android:background="@color/oren_seliso"
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="visible">
 
             <com.google.android.material.appbar.MaterialToolbar
+                android:background="@color/oren_seliso"
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize" />
 
             <TextView
+
                 android:id="@+id/with"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -174,7 +178,7 @@
             android:layout_marginTop="@dimen/rtp_session_duration_top_margin"
             android:alpha="0.7"
             android:src="@drawable/ic_verified_user_24dp"
-            app:tint="@color/light_green_600" />
+            app:tint="@color/green600" />
 
         <ImageView
             android:id="@+id/pip_local_mic_off_indicator"
@@ -226,10 +230,10 @@
                     android:layout_margin="16dp"
                     android:src="@drawable/ic_call_24dp"
                     android:visibility="gone"
-                    app:backgroundTint="?colorPrimary"
                     app:elevation="4dp"
                     app:fabCustomSize="72dp"
                     app:maxImageSize="36dp"
+                    app:backgroundTint="@color/green700"
                     app:tint="?colorOnPrimary"
                     tools:visibility="visible" />
 

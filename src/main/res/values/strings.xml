@@ -190,6 +190,7 @@
     <string name="block_jabber_id">Block XMPP address</string>
     <string name="account_settings_example_jabber_id">username@example.com</string>
     <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
     <string name="invalid_jid">This is not a valid XMPP address</string>
     <string name="error_out_of_memory">Out of memory. Image too big</string>
     <string name="add_phone_book_text">Do you want to add %s to your address book?</string>

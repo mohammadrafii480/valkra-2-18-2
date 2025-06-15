@@ -4,11 +4,13 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:background="@color/dark_grey_seliso">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
+            android:background="@color/oren_seliso"
             android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -23,7 +25,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/button_bar"
-            android:layout_below="@id/app_bar_layout">
+            android:layout_below="@id/toolbar">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -155,6 +157,7 @@
             android:paddingVertical="8dp">
 
             <Button
+                android:textColor="@color/red500"
                 android:id="@+id/cancel_button"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
@@ -164,7 +167,10 @@
                 android:text="@string/cancel" />
 
 
+
             <Button
+                android:textColor="@color/white"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:id="@+id/save_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

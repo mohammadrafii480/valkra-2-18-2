@@ -7,8 +7,12 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical">
 
+
+
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
+            android:background="@color/oren_seliso"
             android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -18,6 +22,8 @@
                 android:minHeight="?attr/actionBarSize" />
 
         </com.google.android.material.appbar.AppBarLayout>
+
+
 
         <ScrollView
             android:layout_width="match_parent"

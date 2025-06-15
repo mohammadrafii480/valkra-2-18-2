@@ -2964,11 +2964,11 @@ public class ConversationFragment extends XmppFragment
             status = Presence.Availability.OFFLINE;
         }
         this.binding.textSendButton.setTag(action);
-        this.binding.textSendButton.setIconResource(
-                SendButtonTool.getSendButtonImageResource(action));
-        this.binding.textSendButton.setIconTint(
-                ColorStateList.valueOf(
-                        SendButtonTool.getSendButtonColor(this.binding.textSendButton, status)));
+//        this.binding.textSendButton.setIconResource(
+//                SendButtonTool.getSendButtonImageResource(action));
+//        this.binding.textSendButton.setIconTint(
+//                ColorStateList.valueOf(
+//                        SendButtonTool.getSendButtonColor(this.binding.textSendButton, status)));
         // TODO send button color
         final Activity activity = getActivity();
         if (activity != null) {}

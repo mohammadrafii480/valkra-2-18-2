@@ -10,6 +10,7 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
+            android:background="@color/oren_seliso"
             android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -18,22 +19,29 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize" />
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tab_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/app_bar_layout"
-                app:tabGravity="fill"
-                app:tabMode="fixed" />
-
         </com.google.android.material.appbar.AppBarLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/app_bar_layout"
+            android:background="@color/oren_seliso"
+            android:elevation="@dimen/toolbar_elevation"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/white87"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/white70" />
 
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/start_conversation_view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/app_bar_layout">
+            android:layout_below="@id/tab_layout"
+            android:background="@color/dark_grey_seliso">
 
 
         </androidx.viewpager.widget.ViewPager>
@@ -52,12 +60,14 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:contentDescription="@string/add_contact_or_create_or_join_group_chat"
-            app:sdMainFabClosedBackgroundColor="?colorPrimaryContainer"
+            app:backgroundTint="#9ba8ae"
+            app:sdMainFabClosedBackgroundColor="#9ba8ae"
             app:sdMainFabClosedIconColor="?colorOnPrimaryContainer"
             app:sdMainFabClosedSrc="@drawable/ic_add_24dp"
-            app:sdMainFabOpenedBackgroundColor="?colorPrimaryContainer"
             app:sdMainFabOpenedIconColor="?colorOnPrimaryContainer"
+            app:sdMainFabOpenedBackgroundColor="#9ba8ae"
             app:sdOverlayLayout="@id/overlay"
+            app:tint="@color/white"
             app:sdUseReverseAnimationOnClose="true" />
     </RelativeLayout>
 </layout>

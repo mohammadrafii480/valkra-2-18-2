@@ -124,7 +124,7 @@ public class MediaPreviewAdapter
                 imageView.setBackgroundColor(0x00000000);
             } else {
                 imageView.setBackgroundColor(
-                        ContextCompat.getColor(imageView.getContext(), R.color.gray_800));
+                        ContextCompat.getColor(imageView.getContext(), R.color.grey800));
                 imageView.setImageDrawable(null);
                 final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
                 final AsyncDrawable asyncDrawable =

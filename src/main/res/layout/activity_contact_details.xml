@@ -7,10 +7,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/dark_grey_seliso"
+        >
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
+            android:background="@color/oren_seliso"
             android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -20,6 +24,7 @@
                 android:minHeight="?attr/actionBarSize" />
 
         </com.google.android.material.appbar.AppBarLayout>
+
 
         <ScrollView
             android:layout_width="fill_parent"
@@ -34,6 +39,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="@color/dark_grey_seliso"
+
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -116,12 +123,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
+                                android:textColor="@color/white"
+
                                 android:text="@string/send_presence_updates" />
 
                             <CheckBox
                                 android:id="@+id/details_receive_presence"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:textColor="@color/white"
                                 android:text="@string/receive_presence_updates" />
                         </LinearLayout>
 
@@ -141,6 +151,7 @@
                     android:id="@+id/media_wrapper"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="@color/dark_grey_seliso"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -180,6 +191,7 @@
                     android:id="@+id/keys_wrapper"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="@color/dark_grey_seliso"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -204,12 +216,12 @@
                             android:paddingHorizontal="@dimen/card_padding_list">
 
                             <TextView
+                                android:textColor="@color/white"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="@dimen/list_padding"
                                 android:text="@string/contact_uses_unverified_keys"
-                                android:textAppearance="?textAppearanceBodyMedium"
-                                android:textColor="?colorOnSurfaceVariant" />
+                                android:textAppearance="?textAppearanceBodyMedium"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -222,12 +234,14 @@
 
                             <Button
                                 android:id="@+id/scan_button"
+                                android:textColor="@color/white"
                                 style="@style/Widget.Material3.Button.TextButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/scan_qr_code" />
 
                             <Button
+                                android:textColor="@color/white"
                                 android:id="@+id/show_inactive_devices"
                                 style="@style/Widget.Material3.Button.TextButton"
                                 android:layout_width="wrap_content"

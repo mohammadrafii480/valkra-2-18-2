@@ -105,38 +105,4 @@ public class SendButtonTool {
             case CANCEL -> R.drawable.ic_cancel_24dp;
         };
     }
-
-    public @ColorInt static int getSendButtonColor(
-            final View view, final Presence.Availability status) {
-        final boolean nightMode = Activities.isNightMode(view.getContext());
-        return switch (status) {
-            case OFFLINE ->
-                    MaterialColors.getColor(
-                            view, com.google.android.material.R.attr.colorOnSurface);
-            case ONLINE, CHAT ->
-                    MaterialColors.harmonizeWithPrimary(
-                            view.getContext(),
-                            ContextCompat.getColor(
-                                    view.getContext(),
-                                    nightMode ? R.color.green_300 : R.color.green_800));
-            case AWAY ->
-                    MaterialColors.harmonizeWithPrimary(
-                            view.getContext(),
-                            ContextCompat.getColor(
-                                    view.getContext(),
-                                    nightMode ? R.color.amber_300 : R.color.amber_800));
-            case XA ->
-                    MaterialColors.harmonizeWithPrimary(
-                            view.getContext(),
-                            ContextCompat.getColor(
-                                    view.getContext(),
-                                    nightMode ? R.color.orange_300 : R.color.orange_800));
-            case DND ->
-                    MaterialColors.harmonizeWithPrimary(
-                            view.getContext(),
-                            ContextCompat.getColor(
-                                    view.getContext(),
-                                    nightMode ? R.color.red_300 : R.color.red_800));
-        };
-    }
 }

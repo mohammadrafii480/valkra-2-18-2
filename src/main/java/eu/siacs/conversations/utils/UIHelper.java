@@ -529,11 +529,11 @@ public class UIHelper {
                 switch (status) {
                     case CHAT -> {
                         text = R.string.presence_chat;
-                        yield R.color.green_800;
+                        yield R.color.green800;
                     }
                     case ONLINE -> {
                         text = R.string.presence_online;
-                        yield R.color.green_800;
+                        yield R.color.green800;
                     }
                     case AWAY -> {
                         text = R.string.presence_away;
@@ -545,7 +545,7 @@ public class UIHelper {
                     }
                     case DND -> {
                         text = R.string.presence_dnd;
-                        yield R.color.red_800;
+                        yield R.color.red800;
                     }
                     default -> throw new IllegalStateException();
                 };

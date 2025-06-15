@@ -9,6 +9,8 @@ import im.conversations.android.xmpp.model.jabber.Status;
 @XmlElement
 public class Presence extends Stanza implements EntityCapabilities {
 
+
+
     public Presence() {
         super(Presence.class);
     }

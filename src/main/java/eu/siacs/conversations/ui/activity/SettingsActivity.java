@@ -37,7 +37,7 @@ public class SettingsActivity extends XmppActivity {
         super.onCreate(savedInstanceState);
         final ActivitySettingsBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_settings);
-        setSupportActionBar(binding.materialToolbar);
+        setSupportActionBar(binding.toolbar);
         Activities.setStatusAndNavigationBarColors(this, binding.getRoot());
 
         final var intent = getIntent();
@@ -58,7 +58,7 @@ public class SettingsActivity extends XmppActivity {
                     .replace(R.id.fragment_container, preferenceFragment)
                     .commit();
         }
-        binding.materialToolbar.setNavigationOnClickListener(
+        binding.toolbar.setNavigationOnClickListener(
                 view -> {
                     if (fragmentManager.getBackStackEntryCount() == 0) {
                         finish();

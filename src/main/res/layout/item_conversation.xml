@@ -17,7 +17,7 @@
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="?android:selectableItemBackground"
+                android:background="@color/dark_grey_seliso"
                 android:orientation="horizontal"
                 android:padding="8dp">
 
@@ -56,6 +56,7 @@
                         android:layout_marginTop="4dp">
 
                         <TextView
+                            android:textColor="@color/white"
                             android:id="@+id/sender_name"
                             style="?textAppearanceBodyMedium"
                             android:layout_width="wrap_content"
@@ -67,7 +68,6 @@
                             android:maxLines="1"
                             android:minHeight="18sp"
                             android:text="@string/me"
-                            android:textColor="?colorOnSurfaceVariant"
                             android:visibility="visible" />
 
                         <LinearLayout
@@ -121,6 +121,7 @@
                             android:layout_marginStart="4dp"
                             android:layout_toStartOf="@+id/pinned_on_top"
                             android:src="@drawable/ic_notifications_24dp"
+                            app:tint="@color/white"
                             android:visibility="visible" />
 
                         <ImageView
@@ -132,6 +133,7 @@
                             android:layout_marginStart="4dp"
                             android:layout_toStartOf="@+id/unread_count"
                             android:src="@drawable/ic_star_24dp"
+                            app:tint="@color/white"
                             android:visibility="visible" />
 
                         <eu.siacs.conversations.ui.widget.UnreadCountCustomView
@@ -144,8 +146,7 @@
                             android:layout_marginTop="2dp"
                             android:layout_marginBottom="1dp"
                             android:visibility="gone"
-                            app:backgroundColor="?colorTertiaryContainer"
-                            app:textColor="?colorOnTertiaryContainer" />
+                            app:backgroundColor="?colorTertiaryContainer"/>
 
                     </RelativeLayout>
 

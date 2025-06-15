@@ -1,5 +1,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <RelativeLayout
@@ -11,6 +12,7 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
+            android:background="@color/oren_seliso"
             android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -44,7 +46,10 @@
                 android:layout_gravity="end|bottom"
                 android:layout_margin="16dp"
                 android:contentDescription="@string/action_unfix_from_location"
-                android:src="@drawable/ic_gps_fixed_24dp" />
+                android:src="@drawable/ic_gps_fixed_24dp"
+                android:backgroundTint="@color/oren_seliso"
+                app:tint="@color/white"
+                />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -10,7 +10,9 @@
         android:orientation="vertical">
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
+            android:background="@color/oren_seliso"
             android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -29,9 +31,11 @@
                 android:id="@+id/muc_main_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/dark_grey_seliso"
                 android:orientation="vertical">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:backgroundTint="@color/dark_grey_seliso"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -209,6 +213,8 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:backgroundTint="@color/dark_grey_seliso"
+
                     android:id="@+id/users_wrapper"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -229,7 +235,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/no_users_hint_channel"
                             android:textAppearance="?textAppearanceBodyMedium"
-                            android:textColor="?colorOnSurfaceVariant" />
+                            android:textColor="@color/white" />
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/users"
@@ -246,6 +252,7 @@
                             android:orientation="horizontal">
 
                             <Button
+                                android:textColor="@color/white"
                                 android:id="@+id/invite"
                                 style="@style/Widget.Material3.Button.TextButton"
                                 android:layout_width="wrap_content"
@@ -253,6 +260,7 @@
                                 android:text="@string/invite" />
 
                             <Button
+                                android:textColor="@color/white"
                                 android:id="@+id/show_users"
                                 style="@style/Widget.Material3.Button.TextButton"
                                 android:layout_width="wrap_content"
@@ -263,6 +271,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:backgroundTint="@color/dark_grey_seliso"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"

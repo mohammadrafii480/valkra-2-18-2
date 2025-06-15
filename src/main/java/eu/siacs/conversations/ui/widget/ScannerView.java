@@ -59,9 +59,9 @@ public class ScannerView extends View {
         final Resources resources = context.getResources();
         maskColor = ContextCompat.getColor(context, R.color.black54);
         maskResultColor = ContextCompat.getColor(context, R.color.black87);
-        laserColor = ContextCompat.getColor(context, R.color.red_500);
-        dotColor = ContextCompat.getColor(context, R.color.orange_500);
-        dotResultColor = ContextCompat.getColor(context, R.color.green_500);
+        laserColor = ContextCompat.getColor(context, R.color.red500);
+        dotColor = ContextCompat.getColor(context, R.color.orange500);
+        dotResultColor = ContextCompat.getColor(context, R.color.green500);
 
         maskPaint = new Paint();
         maskPaint.setStyle(Style.FILL);

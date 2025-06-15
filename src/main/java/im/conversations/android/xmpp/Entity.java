@@ -1,10 +1,14 @@
 package im.conversations.android.xmpp;
 
+import java.util.Locale;
+
 import eu.siacs.conversations.xmpp.Jid;
 
 public abstract class Entity {
 
     public final Jid address;
+
+
 
     private Entity(final Jid address) {
         this.address = address;

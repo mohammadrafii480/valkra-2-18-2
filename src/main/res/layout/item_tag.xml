@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/background_label"
-    android:backgroundTint="@color/green_700"
+    android:backgroundTint="@color/green700"
     android:maxLines="1"
     android:minHeight="10dp"
     android:paddingHorizontal="8dp"
