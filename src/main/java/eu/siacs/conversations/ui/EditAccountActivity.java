@@ -599,7 +599,7 @@ public class EditAccountActivity extends OmemoActivity
         sessions = new SessionManager(mContext);
         sessions.saveServerName(null);
         sessions.saveJabberID(null);
-        appName = "VAAVALKRA";
+        appName = "VACVALKRA";
 
         if (savedInstanceState != null) {
             this.mSavedInstanceAccount = savedInstanceState.getString("account");
