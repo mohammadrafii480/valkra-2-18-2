@@ -762,6 +762,8 @@ public class StartConversationActivity extends XmppActivity
         AccountUtils.showHideMenuItems(menu);
         final MenuItem menuHideOffline = menu.findItem(R.id.action_hide_offline);
         final MenuItem qrCodeScanMenuItem = menu.findItem(R.id.action_scan_qr_code);
+        final MenuItem qrCodeShowMenuItem = menu.findItem(R.id.action_show_qr_code);
+        qrCodeShowMenuItem.setVisible(true);
         final MenuItem privacyPolicyMenuItem = menu.findItem(R.id.action_privacy_policy);
         privacyPolicyMenuItem.setVisible(
                 BuildConfig.PRIVACY_POLICY != null
@@ -808,6 +810,15 @@ public class StartConversationActivity extends XmppActivity
                     filter(mSearchEditText.getText().toString());
                 }
                 invalidateOptionsMenu();
+                return true;
+            case R.id.action_show_qr_code:
+                Intent intent = new Intent(this, ShowQrCodeActivity.class);
+                List<Account> accounts = xmppConnectionService.getAccounts();
+                if (!accounts.isEmpty()) {
+                    intent.putExtra("jid", accounts.get(0).getJid().asBareJid().toString());
+                }
+                startActivity(intent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

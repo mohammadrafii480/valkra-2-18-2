@@ -2,11 +2,15 @@ package eu.siacs.conversations.xmpp;
 
 import static eu.siacs.conversations.utils.Random.SECURE_RANDOM;
 
+import android.provider.Settings;
+import eu.siacs.conversations.Conversations;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.security.KeyChain;
 import android.util.Base64;
 import android.util.Log;
@@ -138,9 +142,11 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -1746,20 +1752,37 @@ public class XmppConnection implements Runnable {
         }
     }
 
+//    private void checkAssignedDomainOrThrow(final Jid jid) throws StateChangingException {
+//        if (jid == null) {
+//            Log.d(Config.LOGTAG, account.getJid().asBareJid() + ": bind response is missing jid");
+//            throw new StateChangingException(Account.State.BIND_FAILURE);
+//        }
+//        final var current = this.account.getJid().getDomain();
+//        if (jid.getDomain().equals(current)) {
+//            return;
+//        }
+//        Log.d(
+//                Config.LOGTAG,
+//                account.getJid().asBareJid()
+//                        + ": server tried to re-assign domain to "
+//                        + jid.getDomain());
+//        throw new StateChangingException(Account.State.BIND_FAILURE);
+//    }
     private void checkAssignedDomainOrThrow(final Jid jid) throws StateChangingException {
         if (jid == null) {
             Log.d(Config.LOGTAG, account.getJid().asBareJid() + ": bind response is missing jid");
             throw new StateChangingException(Account.State.BIND_FAILURE);
         }
-        final var current = this.account.getJid().getDomain();
-        if (jid.getDomain().equals(current)) {
+
+        final String current = this.account.getJid().getDomain().toString().toLowerCase(Locale.ROOT);
+        final String assigned = jid.getDomain().toString().toLowerCase(Locale.ROOT);
+
+        if (assigned.equals(current)) {
             return;
         }
-        Log.d(
-                Config.LOGTAG,
-                account.getJid().asBareJid()
-                        + ": server tried to re-assign domain to "
-                        + jid.getDomain());
+
+        Log.d(Config.LOGTAG,
+                account.getJid().asBareJid() + ": server tried to re-assign domain to " + assigned);
         throw new StateChangingException(Account.State.BIND_FAILURE);
     }
 
@@ -2501,8 +2524,12 @@ public class XmppConnection implements Runnable {
         tagWriter.writeTag(stream, flush);
     }
 
+//    private static String createNewResource() {
+//        return String.format("%s.%s", BuildConfig.APP_NAME, CryptoHelper.random(3));
+//    }
+
     private static String createNewResource() {
-        return String.format("%s.%s", BuildConfig.APP_NAME, CryptoHelper.random(3));
+        return String.format("Garkom-%s", UUID.randomUUID().toString().substring(0, 6));
     }
 
     public void sendRequestStanza() {

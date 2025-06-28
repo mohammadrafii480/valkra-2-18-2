@@ -23,5 +23,6 @@
             android:name=".ui.EasyOnboardingInviteActivity"
             android:label="@string/invite_to_app"
             android:launchMode="singleTask" />
+        <activity android:name=".ui.ShowQrCodeActivity" />
     </application>
 </manifest>
