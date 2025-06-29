@@ -1120,4 +1120,6 @@
     <string name="account_status_service_outage_scheduled">Planned Downtime</string>
     <string name="account_status_service_outage_known">Service Down (Known Issue)</string>
     <string name="sos_scheduled_return">The service is scheduled to return at %s</string>
+    <string name="scroll_to_bottom">Scroll to bottom</string>
+    <string name="hint_type_message">Ketik pesan di sini</string>
 </resources>

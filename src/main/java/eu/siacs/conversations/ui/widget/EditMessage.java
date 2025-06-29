@@ -47,8 +47,12 @@ public class EditMessage extends AppCompatEditText {
     };
     private boolean lastInputWasTab = false;
 
+    public EditMessage(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
     public EditMessage(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, android.R.attr.editTextStyle);
     }
 
     public EditMessage(Context context) {

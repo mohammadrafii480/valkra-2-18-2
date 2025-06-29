@@ -40,8 +40,17 @@ public class UnreadCountCustomView extends View {
 
     private void initXMLAttrs(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.UnreadCountCustomView);
-        setBackgroundColor(a.getColor(a.getIndex(0), ContextCompat.getColor(context, R.color.md_theme_light_tertiaryContainer)));
-        this.textColor = a.getColor(a.getIndex(1),ContextCompat.getColor(context, R.color.md_theme_light_onTertiaryContainer));
+
+        if (a.hasValue(R.styleable.UnreadCountCustomView_unreadBackgroundColor)) {
+            setBackgroundColor(a.getColor(R.styleable.UnreadCountCustomView_unreadBackgroundColor,
+                    ContextCompat.getColor(context, R.color.md_theme_light_tertiaryContainer)));
+        }
+
+        if (a.hasValue(R.styleable.UnreadCountCustomView_unreadTextColor)) {
+            this.textColor = a.getColor(R.styleable.UnreadCountCustomView_unreadTextColor,
+                    ContextCompat.getColor(context, R.color.md_theme_light_onTertiaryContainer));
+        }
+
         a.recycle();
     }
 

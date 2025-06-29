@@ -10,7 +10,6 @@
         <item name="android:navigationBarColor">@android:color/black</item>
     </style>
 
-
     <style name="Theme.Conversations3.SplashScreen" parent="@style/Theme.Conversations3">
         <item name="android:windowBackground">@drawable/main_logo</item>
         <item name="android:windowLightStatusBar">true</item>
@@ -22,8 +21,7 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
-
-    <style name="Theme.Conversations3" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.Conversations3.Light" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="windowActionModeOverlay">true</item>
         <item name="colorPrimary">@color/oren_seliso</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
@@ -92,6 +90,8 @@
 
         <item name="dialog_horizontal_padding">24dp</item>
         <item name="dialog_vertical_padding">16dp</item>
+        <item name="editTextStyle">@style/Widget.Conversations.EditText</item>
+
     </style>
 
     <style name="MaterialPreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay">
@@ -111,8 +111,7 @@
         <item name="android:textSize">?TextSizeInput</item>
     </style>
 
-
-    <style name="ConversationsTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="ConversationsTheme" parent="Theme.Material3.DayNight.NoActionBar">
 
     </style>
 

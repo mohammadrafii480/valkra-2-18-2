@@ -674,7 +674,7 @@ public class ConversationFragment extends XmppFragment
             hideUnreadMessagesCount();
         } else {
             binding.scrollToBottomButton.setEnabled(true);
-            binding.scrollToBottomButton.show();
+            binding.scrollToBottomButton.setVisibility(View.VISIBLE);
             if (lastMessageUuid == null) {
                 lastMessageUuid = conversation.getLatestMessage().getUuid();
             }
@@ -2571,7 +2571,7 @@ public class ConversationFragment extends XmppFragment
             return;
         }
         this.binding.scrollToBottomButton.setEnabled(false);
-        this.binding.scrollToBottomButton.hide();
+        binding.scrollToBottomButton.setVisibility(View.GONE);
         this.binding.unreadCountCustomView.setVisibility(View.GONE);
     }
 

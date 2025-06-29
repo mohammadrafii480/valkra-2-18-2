@@ -31,7 +31,8 @@ public class ShowQrCodeActivity extends AppCompatActivity {
             QRCodeWriter writer = new QRCodeWriter();
             try {
                 int size = 512;
-                Bitmap bitmap = toBitmap(writer.encode(jid, BarcodeFormat.QR_CODE, size, size));
+                String xmppUri = "xmpp:" + jid;  // 👈 Tambahkan prefix
+                Bitmap bitmap = toBitmap(writer.encode(xmppUri, BarcodeFormat.QR_CODE, size, size));
                 qrImage.setImageBitmap(bitmap);
             } catch (WriterException e) {
                 e.printStackTrace();

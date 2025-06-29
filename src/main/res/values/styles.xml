@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- FIX for M3 FloatingActionButton theme crash -->
+    <style name="ThemeOverlay.Material3.FloatingActionButton.Primary" parent="">
+        <item name="backgroundTint">#000000</item> <!-- atau @color/black -->
+        <item name="rippleColor">#FFFFFF</item>     <!-- atau @color/white -->
+    </style>
+
+    <style name="Theme.Conversations3" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+    </style>
+
+</resources>

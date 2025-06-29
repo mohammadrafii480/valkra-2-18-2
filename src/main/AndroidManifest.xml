@@ -92,7 +92,7 @@
         android:networkSecurityConfig="@xml/network_security_configuration"
         android:preserveLegacyExternalStorage="true"
         android:requestLegacyExternalStorage="true"
-        android:theme="@style/Theme.Conversations3"
+        android:theme="@style/Theme.Conversations3.Light"
         tools:targetApi="tiramisu">
 
         <meta-data
