@@ -1,6 +1,5 @@
 package eu.siacs.conversations.xmpp.jingle.transports;
 
-import static eu.siacs.conversations.xmpp.jingle.WebRTCWrapper.buildConfiguration;
 import static eu.siacs.conversations.xmpp.jingle.WebRTCWrapper.logDescription;
 
 import android.content.Context;
@@ -31,6 +30,7 @@ import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -626,4 +626,40 @@ public class WebRTCDataChannelTransport implements Transport {
         @Override
         public void onStateChange() {}
     }
+
+    private static PeerConnection.RTCConfiguration buildConfiguration(
+            final Collection<PeerConnection.IceServer> existingIceServers,
+            final boolean trickle) {
+
+        List<PeerConnection.IceServer> iceServers = new ArrayList<>();
+
+        // STUN dari Xirsys
+        iceServers.add(PeerConnection.IceServer.builder("stun:ss-turn2.xirsys.com:3478")
+                .createIceServer());
+
+        // TURN dari Xirsys
+        iceServers.add(PeerConnection.IceServer.builder("turn:ss-turn2.xirsys.com:3478?transport=udp")
+                .setUsername("nYP_5YzwOtvLRsNenPb3m-EF-D3vVQPjZoCvJWDRtTamGt-vJYQZlAoCUojR18LnAAAAAGfaPwN0YWxhbmc=")
+                .setPassword("4b65a386-0475-11f0-88c4-0242ac140004")
+                .createIceServer());
+
+        // Tambahkan parameter existing ICE servers jika tersedia
+        if (existingIceServers != null) {
+            iceServers.addAll(existingIceServers);
+        }
+
+        PeerConnection.RTCConfiguration config = new PeerConnection.RTCConfiguration(iceServers);
+
+        config.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN;
+        config.tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED;
+        config.rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.NEGOTIATE;
+        config.enableImplicitRollback = true;
+
+        config.continualGatheringPolicy = trickle
+                ? PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
+                : PeerConnection.ContinualGatheringPolicy.GATHER_ONCE;
+
+        return config;
+    }
+
 }

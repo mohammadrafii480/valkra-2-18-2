@@ -15,8 +15,11 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import eu.siacs.conversations.Config;
 import eu.siacs.conversations.services.XmppConnectionService;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -374,23 +377,43 @@ public class WebRTCWrapper {
         }
     }
 
-    public static PeerConnection.RTCConfiguration buildConfiguration(
-            final Collection<PeerConnection.IceServer> iceServers, final boolean trickle) {
-        final PeerConnection.RTCConfiguration rtcConfig =
-                new PeerConnection.RTCConfiguration(ImmutableList.copyOf(iceServers));
-        rtcConfig.tcpCandidatePolicy =
-                PeerConnection.TcpCandidatePolicy.DISABLED; // XEP-0176 doesn't support tcp
-        if (trickle) {
-            rtcConfig.continualGatheringPolicy =
-                    PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY;
-        } else {
-            rtcConfig.continualGatheringPolicy =
-                    PeerConnection.ContinualGatheringPolicy.GATHER_ONCE;
+    private static PeerConnection.RTCConfiguration buildConfiguration(
+            final Collection<PeerConnection.IceServer> existingIceServers,
+            final boolean trickle)
+    {
+
+        List<PeerConnection.IceServer> iceServers = new ArrayList<>();
+
+        // STUN dari Xirsys
+        iceServers.add(PeerConnection.IceServer.builder("stun:ss-turn2.xirsys.com:3478")
+                .createIceServer());
+
+        // TURN dari Xirsys
+        iceServers.add(PeerConnection.IceServer.builder("turn:ss-turn2.xirsys.com:3478?transport=udp")
+                .setUsername("nYP_5YzwOtvLRsNenPb3m-EF-D3vVQPjZoCvJWDRtTamGt-vJYQZlAoCUojR18LnAAAAAGfaPwN0YWxhbmc=")
+                .setPassword("4b65a386-0475-11f0-88c4-0242ac140004")
+                .createIceServer());
+
+        // Tambahkan ICE servers dari parameter, jika ada
+        if (existingIceServers != null) {
+            iceServers.addAll(existingIceServers);
         }
-        rtcConfig.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN;
-        rtcConfig.rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.NEGOTIATE;
-        rtcConfig.enableImplicitRollback = true;
-        return rtcConfig;
+
+        // Buat konfigurasi RTC
+        PeerConnection.RTCConfiguration config = new PeerConnection.RTCConfiguration(iceServers);
+
+        // Konfigurasi lanjutan
+        config.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN;
+        config.tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED;
+        config.rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.NEGOTIATE;
+        config.enableImplicitRollback = true;
+
+        // Gathering policy berdasarkan flag trickle
+        config.continualGatheringPolicy = trickle
+                ? PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
+                : PeerConnection.ContinualGatheringPolicy.GATHER_ONCE;
+
+        return config;
     }
 
     void reconfigurePeerConnection(
