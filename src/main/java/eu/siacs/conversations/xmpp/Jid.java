@@ -342,41 +342,4 @@ public abstract class Jid implements Comparable<Jid>, Serializable, CharSequence
             }
         }
     }
-
-    public static Jid ofEscaped(CharSequence local, CharSequence domain, CharSequence resource) {
-        try {
-            if (resource == null) {
-                return new WrappedJid(
-                        JidCreate.bareFrom(
-                                Localpart.from(local.toString()),
-                                Domainpart.from(domain.toString())
-                        )
-                );
-            }
-            return new WrappedJid(JidCreate.entityFullFrom(
-                    Localpart.from(local.toString()),
-                    Domainpart.from(domain.toString()),
-                    Resourcepart.from(resource.toString())
-            ));
-        } catch (XmppStringprepException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public static Jid ofEscaped(CharSequence jid) {
-        try {
-            return new WrappedJid(JidCreate.from(jid));
-        } catch (final XmppStringprepException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public String getEscapedLocal() {
-        return null;
-    }
-
-    public String toEscapedString() {
-        return null;
-    }
-
 }

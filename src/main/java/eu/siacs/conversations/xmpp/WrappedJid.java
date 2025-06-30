@@ -63,7 +63,6 @@ public class WrappedJid extends eu.siacs.conversations.xmpp.Jid {
         return localpart == null ? null : localpart.asUnescapedString();
     }
 
-    @Override
     public String getEscapedLocal() {
         final Localpart localpart = inner.getLocalpartOrNull();
         return localpart == null ? null : localpart.toString();
@@ -80,7 +79,6 @@ public class WrappedJid extends eu.siacs.conversations.xmpp.Jid {
         return resourcepart == null ? null : resourcepart.toString();
     }
 
-    @Override
     public String toEscapedString() {
         return inner.toString();
     }

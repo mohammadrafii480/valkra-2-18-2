@@ -5645,7 +5645,7 @@ public class XmppConnectionService extends Service {
 
     public Account findAccountByJid(final Jid jid) {
         for (final Account account : this.accounts) {
-            if (account.getJid().asBareJid().equals(jid.asBareJid())) {
+            if (account.getJid().asBareJid().toString().trim().equals(jid.asBareJid().toString().trim())) {
                 return account;
             }
         }

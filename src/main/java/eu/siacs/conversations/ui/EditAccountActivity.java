@@ -312,6 +312,7 @@ public class EditAccountActivity extends OmemoActivity
     }
 
     public void refreshUiReal() {
+
         invalidateOptionsMenu();
         if (mAccount != null && mAccount.getStatus() != Account.State.ONLINE && mFetchingAvatar) {
             Intent intent = new Intent(this, StartConversationActivity.class);
@@ -428,13 +429,16 @@ public class EditAccountActivity extends OmemoActivity
         // TODO check for Camera / Scan permission
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_BATTERY_OP || requestCode == REQUEST_DATA_SAVER) {
+            Log.e("MASUK SINI","REQUEST_BATTERY_OP || REQUEST_DATA_SAVER");
             updateAccountInformation(mAccount == null);
         }
         if (requestCode == REQUEST_BATTERY_OP) {
+            Log.e("MASUK SINI","REQUEST_BATTERY_OP");
             // the result code is always 0 even when battery permission were granted
             XmppConnectionService.toggleForegroundService(xmppConnectionService);
         }
         if (requestCode == REQUEST_CHANGE_STATUS) {
+            Log.e("MASUK SINI","REQUEST_CHANGE_STATUS");
             PresenceTemplate template = mPendingPresenceTemplate.pop();
             if (template != null && resultCode == Activity.RESULT_OK) {
                 generateSignature(data, template);
@@ -474,6 +478,8 @@ public class EditAccountActivity extends OmemoActivity
 
     protected void updateSaveButton() {
         boolean accountInfoEdited = accountInfoEdited();
+
+        Log.e("MASUK SANA","accountInfoEdited = "+accountInfoEdited+" | mInitMode = "+mInitMode+" | mAccount = "+mAccount);
 
         if (accountInfoEdited && !mInitMode) {
             this.binding.saveButton.setText(R.string.save);
@@ -605,6 +611,7 @@ public class EditAccountActivity extends OmemoActivity
             this.mSavedInstanceAccount = savedInstanceState.getString("account");
             this.mSavedInstanceInit = savedInstanceState.getBoolean("initMode", false);
         }
+        Log.e("mAccount"," test = "+mAccount);
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_account);
         setSupportActionBar(binding.toolbar);
         this.binding.forgotPassword.setVisibility(View.GONE);
@@ -629,6 +636,7 @@ public class EditAccountActivity extends OmemoActivity
         if (Config.DISALLOW_REGISTRATION_IN_UI) {
             this.binding.accountRegisterNew.setVisibility(View.GONE);
         }
+        Log.e("TAG MACCOUNT","test = "+mAccount);
         this.binding.actionEditYourName.setOnClickListener(this::onEditYourNameClicked);
     }
 
@@ -787,7 +795,7 @@ public class EditAccountActivity extends OmemoActivity
 //        final int theme = findTheme();
         if (intent != null) {
             try {
-                this.jidToEdit = Jid.ofEscaped(intent.getStringExtra("jid"));
+                this.jidToEdit = Jid.of(intent.getStringExtra("jid"));
             } catch (final IllegalArgumentException | NullPointerException ignored) {
                 this.jidToEdit = null;
             }
@@ -805,6 +813,12 @@ public class EditAccountActivity extends OmemoActivity
                     displayVerificationWarningDialog(xmppUri);
                 }
             }
+            if (jidToEdit != null && jidToEdit.getLocal().isEmpty()) {
+                Log.d("DEBUG_JID", "jidToEdit kosong atau invalid. Reset ke null");
+                jidToEdit = null;
+                mInitMode = true;
+            }
+
             boolean init = intent.getBooleanExtra("init", false);
             boolean openedFromNotification = intent.getBooleanExtra(EXTRA_OPENED_FROM_NOTIFICATION, false);
             Log.d(Config.LOGTAG, "extras " + intent.getExtras());
@@ -849,6 +863,10 @@ public class EditAccountActivity extends OmemoActivity
         if (mForceRegister != null) {
             this.binding.accountRegisterNew.setVisibility(View.GONE);
         }
+        Log.d("DEBUG_JID", "jidToEdit = " + jidToEdit);
+        Log.d("DEBUG_JID", "mInitMode = " + mInitMode);
+        Log.d("DEBUG_JID", "intent extras = " + intent.getExtras());
+        Log.d("DEBUG_JID", "intent.hasExtra(EXTRA_FORCE_REGISTER) = " + intent.hasExtra(EXTRA_FORCE_REGISTER));
     }
 
     private void displayVerificationWarningDialog(final XmppUri xmppUri) {
@@ -903,16 +921,19 @@ public class EditAccountActivity extends OmemoActivity
         boolean init = true;
         if (mSavedInstanceAccount != null) {
             try {
-                this.mAccount =
-                        xmppConnectionService.findAccountByJid(Jid.of(mSavedInstanceAccount));
+                Log.e("TAG ", "mSavedInstanceAccount != null ");
+                this.mAccount = xmppConnectionService.findAccountByJid(Jid.of(mSavedInstanceAccount));
                 this.mInitMode = mSavedInstanceInit;
                 init = false;
             } catch (IllegalArgumentException e) {
+                Log.e("Exception ", "IllegalArgumentException "+e.getMessage());
                 this.mAccount = null;
             }
 
         } else if (this.jidToEdit != null) {
+            Log.e("TAG ", "this.jidToEdit != null = "+jidToEdit);
             this.mAccount = xmppConnectionService.findAccountByJid(jidToEdit);
+            Log.e("TAG ", "this.jidToEdit != null | mAccount "+mAccount);
         }
 
         if (mAccount != null) {
@@ -949,6 +970,10 @@ public class EditAccountActivity extends OmemoActivity
         updatePortLayout();
         updateSaveButton();
         invalidateOptionsMenu();
+
+        Log.d("DEBUG_ACCOUNT", "jidToEdit = " + jidToEdit);
+        Log.d("DEBUG_ACCOUNT", "mAccount = " + mAccount);
+        Log.d("DEBUG_ACCOUNT", "xmppConnectionService.accounts = " + xmppConnectionService.getAccounts().size());
     }
 
     private String getUserModeDomain() {
@@ -1126,7 +1151,7 @@ public class EditAccountActivity extends OmemoActivity
         if (init) {
             this.binding.accountJid.getEditableText().clear();
             if (mUsernameMode) {
-                String userAcc = this.mAccount.getJid().asBareJid().toEscapedString();
+                String userAcc = this.mAccount.getJid().asBareJid().toString();
                 Log.d("User Acc", userAcc == null ? "Kosong" : userAcc);
                 if (userAcc.indexOf("_at_") > 0) {
                     String[] sp = userAcc.split("@");
@@ -1135,9 +1160,11 @@ public class EditAccountActivity extends OmemoActivity
                 if (!sessions.getLogoutState()) {
                     this.binding.accountJid.getEditableText().append(userAcc);
                 }
-                this.binding.accountJabberid.setText(this.mAccount.getJid().getEscapedLocal());
-            } else {
-                String userAcc = this.mAccount.getJid().asBareJid().toEscapedString();
+                this.binding.accountJabberid.setText(this.mAccount.getJid().toString());
+            }
+            else {
+                String userAcc = this.mAccount.getJid().asBareJid().toString();
+                Log.e("mUsernameMode","ELSE this.mAccount.getJid().asBareJid() "+this.mAccount.getJid().asBareJid());
                 Log.d("User Acc", userAcc == null ? "Kosong" : userAcc);
                 if (userAcc.indexOf("_at_") > 0) {
                     String[] sp = userAcc.split("@");
@@ -1146,7 +1173,7 @@ public class EditAccountActivity extends OmemoActivity
                 if (!sessions.getLogoutState()) {
                     this.binding.accountJid.getEditableText().append(userAcc);
                 }
-                this.binding.accountJabberid.setText(this.mAccount.getJid().asBareJid().toEscapedString());
+                this.binding.accountJabberid.setText(this.mAccount.getJid().asBareJid());
             }
             this.binding.accountPassword.getEditableText().clear();
             if (!sessions.getLogoutState()) {
@@ -1870,13 +1897,13 @@ public class EditAccountActivity extends OmemoActivity
 //                                binding.accountJid.getText().toString(),
 //                                getUserModeDomain(),
 //                                null);
-                jid = Jid.ofEscaped(
+                jid = Jid.of(
                         accountJid,
                         getUserModeDomain(),
                         null);
             } else {
 //                jid = Jid.ofUserInput(binding.accountJid.getText().toString());
-                jid = Jid.ofEscaped(accountJid);
+                jid = Jid.of(accountJid);
                 Resolver.checkDomain(jid);
             }
         }
@@ -1890,7 +1917,7 @@ public class EditAccountActivity extends OmemoActivity
             removeErrorsOnAllBut(binding.accountJidLayout);
             return;
         }
-        Log.d("Jid Log : ", jid.asBareJid().toEscapedString());
+
         final String hostname;
         int numericPort = 5222;
         if (mShowOptions) {
@@ -1961,8 +1988,7 @@ public class EditAccountActivity extends OmemoActivity
             mAccount.setHostname(hostname);
             mAccount.setOption(Account.OPTION_REGISTER, registerNewAccount);
             xmppConnectionService.createAccount(mAccount);
-            Log.d("JID LOG :" , jid.asBareJid().toEscapedString());
-            Log.d("mAccount LOG :" , mAccount.getJid().asBareJid().toEscapedString());
+
 
         }
         binding.hostnameLayout.setError(null);
