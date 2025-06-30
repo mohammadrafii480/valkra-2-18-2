@@ -212,13 +212,12 @@
                                         android:hint="@string/account_settings_hostname"
                                         >
 
-                                        <EditText
+                                        <com.google.android.material.textfield.TextInputEditText
                                             android:id="@+id/hostname"
                                             android:layout_width="fill_parent"
                                             android:layout_height="wrap_content"
                                             android:inputType="textWebEmailAddress"
-                                            android:textSize="14dp"
-                                            />
+                                            android:textSize="14dp"/>
                                     </com.google.android.material.textfield.TextInputLayout>
                                 </LinearLayout>
 
