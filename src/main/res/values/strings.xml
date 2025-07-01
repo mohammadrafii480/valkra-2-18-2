@@ -1122,4 +1122,7 @@
     <string name="sos_scheduled_return">The service is scheduled to return at %s</string>
     <string name="scroll_to_bottom">Scroll to bottom</string>
     <string name="hint_type_message">Ketik pesan di sini</string>
+    <string name="logout_title">Logout Account</string>
+    <string name="logout_message">Are you sure ?</string>
+    <string name="logout">Logout</string>
 </resources>

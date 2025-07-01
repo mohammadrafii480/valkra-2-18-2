@@ -3210,6 +3210,48 @@ public class XmppConnectionService extends Service {
                 });
     }
 
+    public void logoutAccount(final Account account, final Consumer<Boolean> callback) {
+        // Mengecek apakah akun dalam status ONLINE
+        final boolean connected = account.getStatus() == Account.State.ONLINE;
+
+        synchronized (this.conversations) {
+            // Hapus identitas Omemo jika akun terhubung
+            if (connected) {
+                account.getAxolotlService().deleteOmemoIdentity();
+            }
+
+            // Hapus percakapan terkait dengan akun yang logout
+            for (final Conversation conversation : conversations) {
+                if (conversation.getAccount() == account) {
+                    if (conversation.getMode() == Conversation.MODE_MULTI) {
+                        if (connected) {
+                            leaveMuc(conversation); // Jika akun terhubung, keluar dari MUC
+                        }
+                    }
+                    conversations.remove(conversation);
+                    mNotificationService.clear(conversation); // Hapus notifikasi terkait percakapan
+                }
+            }
+
+            // Memutuskan koneksi XMPP (Jika terhubung)
+            if (account.getXmppConnection() != null) {
+                new Thread(() -> disconnect(account, !connected)).start();
+            }
+
+            // Eksekusi logika setelah logout
+            final Runnable postLogoutRunnable = () -> {
+                // Memberikan status logout berhasil ke callback
+                callback.accept(true);
+                // Memperbarui UI setelah logout
+                updateAccountUi();
+                mNotificationService.updateErrorNotification();
+                syncEnabledAccountSetting();
+                toggleForegroundService();
+            };
+            mDatabaseWriterExecutor.execute(postLogoutRunnable);
+        }
+    }
+
     public void unregisterAccount(final Account account, final Consumer<Boolean> callback) {
         final Iq iqPacket = new Iq(Iq.Type.SET);
         final Element query = iqPacket.addChild("query", Namespace.REGISTER);

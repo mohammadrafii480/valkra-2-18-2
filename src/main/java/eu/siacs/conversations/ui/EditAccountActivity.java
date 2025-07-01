@@ -1025,8 +1025,30 @@ public class EditAccountActivity extends OmemoActivity
             case R.id.action_change_presence:
                 changePresence();
                 break;
+            case R.id.action_logout:  // Menambahkan case untuk logout
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.logout_title)
+                        .setMessage(R.string.logout_message)
+                        .setPositiveButton(R.string.logout, (dialog, which) -> {
+                            // Panggil metode logout
+                            logoutAccount();
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logoutAccount() {
+        // Logout akun dengan deleteAccount
+        xmppConnectionService.deleteAccount(mAccount); // Menghapus akun dan menghentikan semua percakapan terkait
+
+        // Arahkan ke layar login setelah proses logout selesai
+        Intent intent = new Intent(this, WelcomeActivity.class);  // Ganti dengan aktivitas login Anda
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void deleteAccount() {

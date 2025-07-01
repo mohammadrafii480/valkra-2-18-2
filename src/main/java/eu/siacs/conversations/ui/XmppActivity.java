@@ -383,6 +383,34 @@ public abstract class XmppActivity extends ActionBarActivity {
         dialog.show();
     }
 
+    protected void logoutAccount(final Account account, final Runnable postLogout) {
+        // Menampilkan dialog konfirmasi logout
+        final MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(R.string.logout_title); // Judul dialog
+        builder.setMessage(R.string.logout_message); // Pesan konfirmasi logout
+        builder.setPositiveButton(getString(R.string.logout), (dialog, which) -> {
+            // Logout akun
+            xmppConnectionService.logoutAccount(account, success -> {
+                if (success) {
+                    // Aksi setelah logout berhasil
+                    if (postLogout != null) {
+                        postLogout.run(); // Jalankan aksi tambahan setelah logout
+                    }
+
+                    // Kembali ke layar login
+                    Intent intent = SignupUtils.getSignUpIntent(this);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent); // Arahkan ke halaman login
+                } else {
+                    // Jika logout gagal, tampilkan pesan error
+                    Toast.makeText(this, "Logout gagal. Coba lagi.", Toast.LENGTH_LONG).show();
+                }
+            });
+        });
+        builder.setNegativeButton(getString(R.string.cancel), null); // Tombol Cancel
+        builder.show(); // Tampilkan dialog
+    }
+
     protected void deleteAccount(final Account account) {
         this.deleteAccount(account, null);
     }
