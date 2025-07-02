@@ -115,6 +115,7 @@ import eu.siacs.conversations.utils.MessageUtils;
 import eu.siacs.conversations.utils.NickValidityChecker;
 import eu.siacs.conversations.utils.PermissionUtils;
 import eu.siacs.conversations.utils.QuickLoader;
+import eu.siacs.conversations.utils.SecureDelete;
 import eu.siacs.conversations.utils.StylingHelper;
 import eu.siacs.conversations.utils.TimeFrameUtils;
 import eu.siacs.conversations.utils.UIHelper;
@@ -128,6 +129,9 @@ import eu.siacs.conversations.xmpp.jingle.Media;
 import eu.siacs.conversations.xmpp.jingle.OngoingRtpSession;
 import eu.siacs.conversations.xmpp.jingle.RtpCapability;
 import im.conversations.android.xmpp.model.stanza.Presence;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -2206,12 +2210,27 @@ public class ConversationFragment extends XmppFragment
         builder.setPositiveButton(
                 R.string.confirm,
                 (dialog, which) -> {
-                    if (activity.xmppConnectionService.getFileBackend().deleteFile(message)) {
-                        message.setDeleted(true);
-                        activity.xmppConnectionService.evictPreview(message.getUuid());
-                        activity.xmppConnectionService.updateMessage(message, false);
-                        activity.onConversationsListItemUpdated();
-                        refresh();
+                    File file = activity.xmppConnectionService.getFileBackend().getFile(message);
+                    if (file != null && file.exists()) {
+                        try {
+                            String result = SecureDelete.DeleteFile(file);
+                            if ("Deleted Success".equals(result)) {
+                                message.setDeleted(true);
+                                activity.xmppConnectionService.evictPreview(message.getUuid());
+                                activity.xmppConnectionService.updateMessage(message, false);
+                                activity.onConversationsListItemUpdated();
+                                refresh();
+                            } else {
+                                Log.w("DeleteFile", "Secure deletion failed: " + result);
+                                Toast.makeText(getContext(), "Gagal menghapus file secara aman: " + result, Toast.LENGTH_LONG).show();
+                            }
+                        } catch (IOException e) {
+                            Log.e("DeleteFile", "IOException saat menghapus file", e);
+                            Toast.makeText(getContext(), "Terjadi kesalahan saat menghapus file", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Log.w("DeleteFile", "File tidak ditemukan");
+                        Toast.makeText(getContext(), "File tidak ditemukan", Toast.LENGTH_LONG).show();
                     }
                 });
         builder.create().show();

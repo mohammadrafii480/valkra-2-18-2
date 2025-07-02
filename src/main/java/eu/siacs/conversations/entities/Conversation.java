@@ -5,6 +5,8 @@ import static eu.siacs.conversations.entities.Bookmark.printableValue;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.common.base.Strings;
@@ -17,12 +19,17 @@ import eu.siacs.conversations.crypto.PgpDecryptionService;
 import eu.siacs.conversations.persistance.DatabaseBackend;
 import eu.siacs.conversations.services.AvatarService;
 import eu.siacs.conversations.services.QuickConversationsService;
+import eu.siacs.conversations.services.XmppConnectionService;
 import eu.siacs.conversations.utils.JidHelper;
 import eu.siacs.conversations.utils.MessageUtils;
+import eu.siacs.conversations.utils.SecureDelete;
 import eu.siacs.conversations.utils.UIHelper;
 import eu.siacs.conversations.xmpp.Jid;
 import eu.siacs.conversations.xmpp.chatstate.ChatState;
 import eu.siacs.conversations.xmpp.mam.MamReference;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -1066,11 +1073,27 @@ public class Conversation extends AbstractEntity
         account.getPgpDecryptionService().decrypt(messages);
     }
 
+    private XmppConnectionService xmppConnectionService;
+
+    public void setXmppConnectionService(XmppConnectionService service) {
+        this.xmppConnectionService = service;
+    }
+
     public void expireOldMessages(long timestamp) {
         synchronized (this.messages) {
-            for (ListIterator<Message> iterator = this.messages.listIterator();
-                    iterator.hasNext(); ) {
-                if (iterator.next().getTimeSent() < timestamp) {
+            for (ListIterator<Message> iterator = this.messages.listIterator(); iterator.hasNext(); ) {
+                Message message = iterator.next();
+                if (message.getTimeSent() < timestamp) {
+                    File file = xmppConnectionService.getFileBackend().getFile(message); // sekarang aman
+                    if (file != null && file.exists()) {
+                        try {
+                            String result = SecureDelete.DeleteFile(file);
+                            Log.d("SecureDelete", "Hapus file: " + file.getName() + " → " + result);
+                        } catch (IOException e) {
+                            Log.e("SecureDelete", "Gagal hapus file", e);
+                        }
+                    }
+
                     iterator.remove();
                 }
             }
