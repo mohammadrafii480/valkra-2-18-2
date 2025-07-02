@@ -56,6 +56,13 @@
         android:title="@string/change_password"/>
 
     <item
+        android:id="@+id/action_enable_protected_pin"
+        android:checkable="true"
+        android:checked="false"
+        app:showAsAction="never"
+        android:title="Protected PIN"/>
+
+    <item
         android:id="@+id/action_logout"
         android:title="@string/logout"/>
 

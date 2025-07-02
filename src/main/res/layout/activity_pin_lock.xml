@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dark_grey_seliso"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp">
+
+    <!-- Logo -->
+    <ImageView
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:src="@drawable/main_logo"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Text -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Your Security PIN"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- PIN Display -->
+    <LinearLayout
+        android:id="@+id/pin_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+
+        <!-- 6 Kotak PIN -->
+        <View style="@style/PinBoxStyle" android:id="@+id/pin_box_1"/>
+        <View style="@style/PinBoxStyle" android:id="@+id/pin_box_2"/>
+        <View style="@style/PinBoxStyle" android:id="@+id/pin_box_3"/>
+        <View style="@style/PinBoxStyle" android:id="@+id/pin_box_4"/>
+        <View style="@style/PinBoxStyle" android:id="@+id/pin_box_5"/>
+        <View style="@style/PinBoxStyle" android:id="@+id/pin_box_6"/>
+    </LinearLayout>
+
+    <!-- Numpad -->
+    <GridLayout
+        android:id="@+id/keypad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="3"
+        android:alignmentMode="alignMargins"
+        android:useDefaultMargins="true">
+
+        <!-- Tombol angka -->
+        <Button style="@style/KeypadButtonStyle" android:text="1" />
+        <Button style="@style/KeypadButtonStyle" android:text="2" />
+        <Button style="@style/KeypadButtonStyle" android:text="3" />
+        <Button style="@style/KeypadButtonStyle" android:text="4" />
+        <Button style="@style/KeypadButtonStyle" android:text="5" />
+        <Button style="@style/KeypadButtonStyle" android:text="6" />
+        <Button style="@style/KeypadButtonStyle" android:text="7" />
+        <Button style="@style/KeypadButtonStyle" android:text="8" />
+        <Button style="@style/KeypadButtonStyle" android:text="9" />
+        <Button style="@style/KeypadButtonStyle" android:text="C" />
+        <Button style="@style/KeypadButtonStyle" android:text="0" />
+        <Button style="@style/KeypadButtonStyle" android:text="⌫" />
+    </GridLayout>
+</LinearLayout>
