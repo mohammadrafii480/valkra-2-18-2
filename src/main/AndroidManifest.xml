@@ -155,6 +155,9 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".ui.PinLockActivity"/>
+        <activity android:name=".ui.SetPinActivity" />
+
         <activity
             android:name=".ui.ShareLocationActivity"
             android:label="@string/title_activity_share_location" />
@@ -428,6 +431,7 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.ceb" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

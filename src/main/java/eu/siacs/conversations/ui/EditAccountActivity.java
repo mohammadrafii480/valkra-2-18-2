@@ -768,6 +768,23 @@ public class EditAccountActivity extends OmemoActivity
             }
             mamPrefs.setVisible(mAccount.getXmppConnection().getFeatures().mam());
             changePresence.setVisible(!mInitMode);
+
+            final MenuItem protectedPinItem = menu.findItem(R.id.action_enable_protected_pin);
+            SharedPreferences prefs = getSharedPreferences("garkom_prefs", MODE_PRIVATE);
+            String pin = prefs.getString("protected_pin", null);
+            boolean enabled = prefs.getBoolean("protected_pin_enabled", false);
+
+            // Hanya tampilkan jika PIN sudah ada
+            if (pin != null) {
+                protectedPinItem.setVisible(true);
+                protectedPinItem.setCheckable(true);
+                protectedPinItem.setChecked(enabled);
+            } else {
+                protectedPinItem.setVisible(true); // tetap bisa diklik meskipun belum set PIN
+                protectedPinItem.setCheckable(true);
+                protectedPinItem.setChecked(false);
+            }
+
         } else {
             showBlocklist.setVisible(false);
             showMoreInfo.setVisible(false);
@@ -1035,6 +1052,22 @@ public class EditAccountActivity extends OmemoActivity
                         })
                         .setNegativeButton(R.string.cancel, null)
                         .show();
+                break;
+            case R.id.action_enable_protected_pin:
+                SharedPreferences prefs = getSharedPreferences("garkom_prefs", MODE_PRIVATE);
+                String currentPin = prefs.getString("protected_pin", null);
+
+                if (currentPin == null) {
+                    Toast.makeText(this, "Silakan atur PIN terlebih dahulu", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, SetPinActivity.class));
+                } else {
+                    boolean currentState = item.isChecked();
+                    item.setChecked(!currentState);
+                    prefs.edit().putBoolean("protected_pin_enabled", !currentState).apply();
+                    Toast.makeText(this,
+                            !currentState ? "Protected PIN diaktifkan" : "Protected PIN dinonaktifkan",
+                            Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -12,4 +12,27 @@
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
     </style>
 
+    <style name="KeypadButton">
+        <item name="android:layout_width">72dp</item>
+        <item name="android:layout_height">72dp</item>
+        <item name="android:textSize">20sp</item>
+<!--        <item name="android:backgroundTint">@color/design_default_color_primary</item>-->
+<!--        <item name="android:textColor">@android:color/white</item>-->
+    </style>
+
+    <style name="PinBoxStyle">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_margin">6dp</item>
+        <item name="android:background">@drawable/pin_box_bg</item>
+    </style>
+
+    <style name="KeypadButtonStyle">
+        <item name="android:layout_width">72dp</item>
+        <item name="android:layout_height">72dp</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:backgroundTint">@color/oren_seliso</item>
+    </style>
+
 </resources>

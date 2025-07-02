@@ -40,6 +40,7 @@ import android.app.FragmentTransaction;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -63,6 +64,7 @@ import eu.siacs.conversations.Config;
 import eu.siacs.conversations.R;
 import eu.siacs.conversations.crypto.OmemoSetting;
 import eu.siacs.conversations.databinding.ActivityConversationsBinding;
+import eu.siacs.conversations.entities.Account;
 import eu.siacs.conversations.entities.Contact;
 import eu.siacs.conversations.entities.Conversation;
 import eu.siacs.conversations.entities.Conversational;
@@ -396,6 +398,7 @@ public class ConversationsActivity extends XmppActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("GARKOM_PIN", "PinLockActivity created");
         ConversationMenuConfigurator.reloadFeatures(this);
         OmemoSetting.load(this);
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_conversations);
@@ -582,6 +585,20 @@ public class ConversationsActivity extends XmppActivity
     public void onStart() {
         super.onStart();
         mRedirectInProcess.set(false);
+        // Tidak perlu lagi trigger PIN di sini — cukup di onResume saja
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        SharedPreferences prefs = getSharedPreferences("garkom_prefs", MODE_PRIVATE);
+        boolean pinEnabled = prefs.getBoolean("protected_pin_enabled", false);
+
+        if (pinEnabled) {
+            prefs.edit().putBoolean("pin_verified", false).apply(); // Reset status saat aplikasi ke background
+            Log.d("GARKOM_PIN", "onStop: pin_verified reset to false");
+        }
     }
 
     @Override
@@ -600,14 +617,38 @@ public class ConversationsActivity extends XmppActivity
 
     @Override
     public void onPause() {
-        this.mActivityPaused = true;
         super.onPause();
+        this.mActivityPaused = true;
+
+        SharedPreferences prefs = getSharedPreferences("garkom_prefs", MODE_PRIVATE);
+        boolean pinEnabled = prefs.getBoolean("protected_pin_enabled", false);
+        if (pinEnabled) {
+            prefs.edit().putBoolean("pin_verified", false).apply(); // Ini penting
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         this.mActivityPaused = false;
+
+        SharedPreferences prefs = getSharedPreferences("garkom_prefs", MODE_PRIVATE);
+        boolean pinEnabled = prefs.getBoolean("protected_pin_enabled", false);
+        String storedPin = prefs.getString("protected_pin", null);
+        boolean pinVerified = prefs.getBoolean("pin_verified", false);
+
+        Log.d("PIN_DEBUG", "onResume: pinEnabled=" + pinEnabled + ", pinVerified=" + pinVerified + ", storedPin=" + storedPin);
+        Log.d("PIN_DEBUG", "this class: " + getClass().getName());
+
+        // Jangan tampilkan PinLockActivity jika sudah di dalamnya
+        if (pinEnabled && storedPin != null && !pinVerified &&
+                !PinLockActivity.class.isAssignableFrom(getClass())) {
+
+            Log.d("GARKOM_PIN", "Launching PinLockActivity");
+            Intent intent = new Intent(this, PinLockActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
     }
 
     private void initializeFragments() {
