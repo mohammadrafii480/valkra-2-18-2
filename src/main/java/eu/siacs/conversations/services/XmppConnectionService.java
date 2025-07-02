@@ -114,6 +114,7 @@ import eu.siacs.conversations.utils.QuickLoader;
 import eu.siacs.conversations.utils.ReplacingSerialSingleThreadExecutor;
 import eu.siacs.conversations.utils.ReplacingTaskManager;
 import eu.siacs.conversations.utils.Resolver;
+import eu.siacs.conversations.utils.SecureDelete;
 import eu.siacs.conversations.utils.SerialSingleThreadExecutor;
 import eu.siacs.conversations.utils.StringUtils;
 import eu.siacs.conversations.utils.TorServiceUtils;
@@ -150,6 +151,7 @@ import im.conversations.android.xmpp.model.pubsub.PubSub;
 import im.conversations.android.xmpp.model.stanza.Iq;
 import im.conversations.android.xmpp.model.storage.PrivateStorage;
 import java.io.File;
+import java.io.IOException;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -1351,24 +1353,23 @@ public class XmppConnectionService extends Service {
 
     public void expireOldMessages(final boolean resetHasMessagesLeftOnServer) {
         mLastExpiryRun.set(SystemClock.elapsedRealtime());
-        mDatabaseWriterExecutor.execute(
-                () -> {
-                    long timestamp = getAutomaticMessageDeletionDate();
-                    if (timestamp > 0) {
-                        databaseBackend.expireOldMessages(timestamp);
-                        synchronized (XmppConnectionService.this.conversations) {
-                            for (Conversation conversation :
-                                    XmppConnectionService.this.conversations) {
-                                conversation.expireOldMessages(timestamp);
-                                if (resetHasMessagesLeftOnServer) {
-                                    conversation.messagesLoaded.set(true);
-                                    conversation.setHasMessagesLeftOnServer(true);
-                                }
-                            }
+        mDatabaseWriterExecutor.execute(() -> {
+            long timestamp = getAutomaticMessageDeletionDate();
+            if (timestamp > 0) {
+                databaseBackend.expireOldMessages(timestamp);
+                synchronized (XmppConnectionService.this.conversations) {
+                    for (Conversation conversation : XmppConnectionService.this.conversations) {
+                        conversation.setXmppConnectionService(this);
+                        conversation.expireOldMessages(timestamp);
+                        if (resetHasMessagesLeftOnServer) {
+                            conversation.messagesLoaded.set(true);
+                            conversation.setHasMessagesLeftOnServer(true);
                         }
-                        updateConversationUi();
                     }
-                });
+                }
+                updateConversationUi();
+            }
+        });
     }
 
     public boolean hasInternetConnection() {
