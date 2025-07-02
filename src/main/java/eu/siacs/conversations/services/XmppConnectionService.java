@@ -2,6 +2,8 @@ package eu.siacs.conversations.services;
 
 import static eu.siacs.conversations.utils.Compatibility.s;
 import static eu.siacs.conversations.utils.Random.SECURE_RANDOM;
+import eu.siacs.conversations.xml.Element;
+import eu.siacs.conversations.xmpp.Jid;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -165,6 +167,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -248,6 +251,10 @@ public class XmppConnectionService extends Service {
                 }
             };
     public DatabaseBackend databaseBackend;
+    public DatabaseBackend getDatabaseBackend() {
+        return this.databaseBackend;
+    }
+
     private final ReplacingSerialSingleThreadExecutor mContactMergerExecutor =
             new ReplacingSerialSingleThreadExecutor("ContactMerger");
     private long mLastActivity = 0;
@@ -1290,6 +1297,72 @@ public class XmppConnectionService extends Service {
             return false;
         }
         return locked || !interactive;
+    }
+
+    public void deletedMessage(Message message, Conversation conversation) {
+        String uuidMsg = message.getUuid();
+        conversation.clearMessageByUUID(uuidMsg);
+        Runnable runnable = () -> {
+            databaseBackend.deleteMessageByUUID(message,conversation);
+            databaseBackend.updateConversation(conversation);
+        };
+        mDatabaseWriterExecutor.execute(runnable);
+    }
+
+    public void remoteDeleteMessage(Message message, Conversation conversation) {
+        if (message == null || conversation == null) return;
+
+        Account account = conversation.getAccount();
+        XmppConnection connection = account.getXmppConnection();
+        Jid to = conversation.getJid();
+        Jid from = account.getJid();
+        String uuidToRetract = message.getUuid();
+
+        Log.d("RemoteDelete", "Retract message with UUID: " + uuidToRetract);
+        Log.d("RemoteDelete", "From: " + from + ", To: " + to);
+
+        // 1. Buat elemen <retract>
+        Element retract = new Element("retract", "urn:xmpp:message-retract:0");
+        retract.setAttribute("id", uuidToRetract);
+
+        // 2. Buat Message stanza
+        im.conversations.android.xmpp.model.stanza.Message msg =
+                new im.conversations.android.xmpp.model.stanza.Message();
+        msg.setAttribute("from", from);
+        msg.setAttribute("to", to);
+        msg.setAttribute("type", "chat");
+        String stanzaId = UUID.randomUUID().toString();
+        msg.setAttribute("id", stanzaId);
+        msg.addChild(retract);
+
+        Log.d("RemoteDelete", "Sending retract stanza with stanza-id: " + stanzaId);
+        Log.d("RemoteDelete", "Stanza XML: " + msg.toString());
+
+        // 3. Kirim
+        connection.sendMessagePacket(msg);
+
+        // 4. Hapus dari memori
+        conversation.clearMessageByUUID(uuidToRetract);
+
+        // 5. Hapus dari database
+        mDatabaseWriterExecutor.execute(() -> {
+            databaseBackend.deleteMessageByUUID(message, conversation);
+            databaseBackend.updateConversation(conversation);
+        });
+
+        // 6. Cache & Secure delete
+        evictPreview(uuidToRetract);
+        File file = getFileBackend().getFile(message);
+        if (file != null && file.exists()) {
+            try {
+                SecureDelete.DeleteFile(file);
+            } catch (IOException e) {
+                Log.e("SecureDelete", "Gagal hapus file media", e);
+            }
+        }
+
+        // 8. Tandai terhapus
+        message.setDeleted(true);
     }
 
     private boolean isPhoneSilenced() {

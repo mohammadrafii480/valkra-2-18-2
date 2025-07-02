@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.util.Base64;
@@ -37,6 +38,7 @@ import im.conversations.android.xmpp.model.disco.info.InfoQuery;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -47,6 +49,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -1627,6 +1630,42 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         return null;
     }
 
+    public void deleteMessageByUUID(Message message, Conversation conversation) {
+        String uuidMsg = message.getUuid();
+
+        final SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        String[] args = {uuidMsg};
+
+        //securedelete
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 20;
+        Random random = new Random();
+
+        String generatedString = "";
+        for(int j = 0; j < 3; j++) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                generatedString = random.ints(leftLimit,rightLimit+1)
+                        .filter(k -> (k <= 57 || k >= 65) && (k <= 90 || k >= 97))
+                        .limit(targetStringLength)
+                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                        .toString();
+
+            } else {
+                byte[] array = new byte[targetStringLength];
+                new Random().nextBytes(array);
+                generatedString = new String(array, StandardCharsets.UTF_8);
+            }
+
+            updateMessageOnlyBodyByMessageUUID(generatedString, uuidMsg);
+        }
+
+        db.delete(Message.TABLENAME, Message.UUID + "=?", args);
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
     public static class FilePath {
         public final UUID uuid;
         public final String path;
@@ -1872,6 +1911,15 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         db.delete(Message.TABLENAME, "timeSent<?", args);
         db.setTransactionSuccessful();
         db.endTransaction();
+    }
+
+    public boolean updateMessageOnlyBodyByMessageUUID(String randomString, String uuid) {
+        ContentValues values = new ContentValues();
+        values.put("body", randomString);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] args = {uuid};
+        return db.update(Message.TABLENAME, values, Message.UUID + "=?", args) == 1;
     }
 
     public MamReference getLastMessageReceived(Account account) {

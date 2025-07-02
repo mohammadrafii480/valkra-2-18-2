@@ -491,13 +491,50 @@ public class MessageParser extends AbstractParser
     @Override
     public void accept(final im.conversations.android.xmpp.model.stanza.Message original) {
         final var account = connection.getAccount();
+
+        final Element retract = original.findChild("retract", "urn:xmpp:message-retract:0");
+        if (retract != null) {
+            final String uuid = retract.getAttribute("id");
+            Log.d("RemoteDelete", "🚨 Menerima retract untuk UUID: " + uuid);
+
+            if (uuid != null) {
+                final Jid sender = original.getFrom();
+                Log.d("RemoteDelete", "Dikirim oleh: " + sender);
+                final Conversation conversation = mXmppConnectionService.find(account, sender.asBareJid());
+
+                if (conversation != null) {
+                    Log.d("RemoteDelete", "🔍 Mencari pesan dengan UUID: " + uuid);
+                    Message message = conversation.findMessageWithRemoteId(uuid, sender);
+
+                    if (message != null) {
+                        Log.d("RemoteDelete", "✅ Pesan ditemukan. Menghapus dari percakapan dan database.");
+                        conversation.clearMessageByUUID(message.getUuid()); // pakai UUID asli dari message
+                        mXmppConnectionService.getDatabaseBackend().deleteMessageByUUID(message, conversation);
+                    } else {
+                        Log.w("RemoteDelete", "❌ Pesan tidak ditemukan dengan UUID: " + uuid + " dalam percakapan.");
+                    }
+
+                    mXmppConnectionService.evictPreview(uuid);
+                    mXmppConnectionService.updateConversationUi();
+                    Log.d("RemoteDelete", "✅ Proses retract selesai untuk UUID: " + uuid);
+                } else {
+                    Log.w("RemoteDelete", "❌ Percakapan tidak ditemukan untuk JID: " + sender.asBareJid());
+                }
+            } else {
+                Log.w("RemoteDelete", "❌ UUID tidak ditemukan dalam tag <retract>");
+            }
+            return;
+        }
+
         if (handleErrorMessage(account, original)) {
             return;
         }
-        final im.conversations.android.xmpp.model.stanza.Message packet;
+
+    final im.conversations.android.xmpp.model.stanza.Message packet;
         Long timestamp = null;
         boolean isCarbon = false;
         String serverMsgId = null;
+
         final Element fin =
                 original.findChild("fin", MessageArchiveService.Version.MAM_0.namespace);
         if (fin != null) {
@@ -1810,4 +1847,5 @@ public class MessageParser extends AbstractParser
             }
         }
     }
+
 }

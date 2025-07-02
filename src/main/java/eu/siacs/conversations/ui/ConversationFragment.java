@@ -23,6 +23,7 @@ import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -1316,6 +1317,8 @@ public class ConversationFragment extends XmppFragment
             final MenuItem cancelTransmission = menu.findItem(R.id.cancel_transmission);
             final MenuItem deleteFile = menu.findItem(R.id.delete_file);
             final MenuItem showErrorMessage = menu.findItem(R.id.show_error_message);
+            final MenuItem deleteMessage = menu.findItem(R.id.delete_message);
+            final MenuItem remoteDeleteMessage = menu.findItem(R.id.remotedelete_message);
             final boolean unInitiatedButKnownSize = MessageUtils.unInitiatedButKnownSize(m);
             final boolean showError =
                     m.getStatus() == Message.STATUS_SEND_FAILED
@@ -1432,13 +1435,37 @@ public class ConversationFragment extends XmppFragment
             if (showError) {
                 showErrorMessage.setVisible(true);
             }
+
+            if (!showError) {
+                boolean isMedia = m.treatAsDownloadable();
+                if (!m.isFileOrImage()) {
+                    deleteMessage.setVisible(true);
+                }
+
+                if (m.getStatus() != Message.STATUS_RECEIVED) {
+                    remoteDeleteMessage.setVisible(true);
+                }
+            }
+
             final String mime = m.isFileOrImage() ? m.getMimeType() : null;
             if ((m.isGeoUri() && GeoHelper.openInOsmAnd(getActivity(), m))
                     || (mime != null && mime.startsWith("audio/"))) {
                 openWith.setVisible(true);
             }
+
         }
     }
+
+    private void deleteMessage(Message message) {
+        this.activity.xmppConnectionService.deletedMessage(message,this.conversation);
+        this.activity.onConversationsListItemUpdated();
+        refresh();
+    }
+
+    private void remoteDeleteMessage(Message message) {
+        this.activity.xmppConnectionService.remoteDeleteMessage(message,this.conversation);
+        this.activity.onConversationsListItemUpdated();
+        refresh();}
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
@@ -1454,6 +1481,12 @@ public class ConversationFragment extends XmppFragment
                 return true;
             case R.id.copy_link:
                 ShareUtil.copyLinkToClipboard(activity, selectedMessage);
+                return true;
+            case R.id.delete_message:
+                deleteMessage(selectedMessage);
+                return true;
+            case R.id.remotedelete_message:
+                remoteDeleteMessage(selectedMessage);
                 return true;
             case R.id.quote_message:
                 quoteMessage(selectedMessage);

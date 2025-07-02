@@ -1101,6 +1101,18 @@ public class Conversation extends AbstractEntity
         }
     }
 
+    public void clearMessageByUUID(String uuidMsg) {
+        synchronized (this.messages) {
+            for (int i = this.messages.size() - 1; i >= 0; --i) {
+                String getUuidMsg = messages.get(i).getUuid();
+                if (getUuidMsg.equals(uuidMsg)) {
+                    this.messages.remove(i);
+                    break;
+                }
+            }
+        }
+    }
+
     public void sort() {
         synchronized (this.messages) {
             Collections.sort(

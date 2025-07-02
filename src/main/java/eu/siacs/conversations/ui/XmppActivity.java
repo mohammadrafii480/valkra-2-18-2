@@ -188,6 +188,7 @@ public abstract class XmppActivity extends ActionBarActivity {
         return null;
     }
 
+
     protected void hideToast() {
         final var toast = this.mToast;
         if (toast == null) {
