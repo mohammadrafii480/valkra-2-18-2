@@ -424,83 +424,47 @@ public abstract class XmppActivity extends ActionBarActivity {
         builder.setPositiveButton(getString(R.string.delete), null);
         builder.setNegativeButton(getString(R.string.cancel), null);
         final AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(
-                dialogInterface -> {
-                    final Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                    button.setOnClickListener(
-                            v -> {
-                                final boolean unregister = deleteFromServer.isChecked();
-                                if (unregister) {
-                                    if (account.isOnlineAndConnected()) {
-                                        deleteFromServer.setEnabled(false);
-                                        button.setText(R.string.please_wait);
-                                        button.setEnabled(false);
-                                        xmppConnectionService.unregisterAccount(
-                                                account,
-                                                result -> {
-                                                    runOnUiThread(
-                                                            () -> {
-                                                                if (result) {
-                                                                    dialog.dismiss();
-                                                                    if (postDelete != null) {
-                                                                        postDelete.run();
-                                                                    }
-                                                                    if (xmppConnectionService
-                                                                                            .getAccounts()
-                                                                                            .size()
-                                                                                    == 0
-                                                                            && Config
-                                                                                            .MAGIC_CREATE_DOMAIN
-                                                                                    != null) {
-                                                                        final Intent intent =
-                                                                                SignupUtils
-                                                                                        .getSignUpIntent(
-                                                                                                this);
-                                                                        intent.setFlags(
-                                                                                Intent
-                                                                                                .FLAG_ACTIVITY_NEW_TASK
-                                                                                        | Intent
-                                                                                                .FLAG_ACTIVITY_CLEAR_TASK);
-                                                                        startActivity(intent);
-                                                                    }
-                                                                } else {
-                                                                    deleteFromServer.setEnabled(
-                                                                            true);
-                                                                    button.setText(R.string.delete);
-                                                                    button.setEnabled(true);
-                                                                    Toast.makeText(
-                                                                                    this,
-                                                                                    R.string
-                                                                                            .could_not_delete_account_from_server,
-                                                                                    Toast
-                                                                                            .LENGTH_LONG)
-                                                                            .show();
-                                                                }
-                                                            });
-                                                });
-                                    } else {
-                                        Toast.makeText(
-                                                        this,
-                                                        R.string.not_connected_try_again,
-                                                        Toast.LENGTH_LONG)
-                                                .show();
-                                    }
-                                } else {
-                                    xmppConnectionService.deleteAccount(account);
-                                    dialog.dismiss();
-                                    if (xmppConnectionService.getAccounts().size() == 0
-                                            && Config.MAGIC_CREATE_DOMAIN != null) {
-                                        final Intent intent = SignupUtils.getSignUpIntent(this);
-                                        intent.setFlags(
-                                                Intent.FLAG_ACTIVITY_NEW_TASK
-                                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                    } else if (postDelete != null) {
-                                        postDelete.run();
-                                    }
-                                }
-                            });
-                });
+
+        dialog.setOnShowListener(dialogInterface -> {
+            final Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(v -> {
+                final boolean unregister = deleteFromServer.isChecked();
+
+                if (!unregister) {
+                    // Tambahkan peringatan jika checkbox belum dicentang
+                    Toast.makeText(this, "Silakan centang untuk konfirmasi penghapusan akun.", Toast.LENGTH_SHORT).show();
+                    return; // Hentikan eksekusi
+                }
+
+                if (account.isOnlineAndConnected()) {
+                    deleteFromServer.setEnabled(false);
+                    button.setText(R.string.please_wait);
+                    button.setEnabled(false);
+
+                    xmppConnectionService.unregisterAccount(account, result -> runOnUiThread(() -> {
+                        if (result) {
+                            dialog.dismiss();
+                            if (postDelete != null) {
+                                postDelete.run();
+                            }
+                            if (xmppConnectionService.getAccounts().size() == 0 && Config.MAGIC_CREATE_DOMAIN != null) {
+                                final Intent intent = SignupUtils.getSignUpIntent(this);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                            }
+                        } else {
+                            deleteFromServer.setEnabled(true);
+                            button.setText(R.string.delete);
+                            button.setEnabled(true);
+                            Toast.makeText(this, R.string.could_not_delete_account_from_server, Toast.LENGTH_LONG).show();
+                        }
+                    }));
+                } else {
+                    Toast.makeText(this, R.string.not_connected_try_again, Toast.LENGTH_LONG).show();
+                }
+            });
+        });
+
         dialog.show();
     }
 
