@@ -71,6 +71,10 @@ public class Conversation extends AbstractEntity
     private static final String ATTRIBUTE_NEXT_ENCRYPTION = "next_encryption";
     private static final String ATTRIBUTE_CORRECTING_MESSAGE = "correcting_message";
     protected final ArrayList<Message> messages = new ArrayList<>();
+    public List<Message> getMessageList() {
+        return new ArrayList<>(messages);
+    }
+
     public AtomicBoolean messagesLoaded = new AtomicBoolean(true);
     protected Account account = null;
     private String draftMessage;

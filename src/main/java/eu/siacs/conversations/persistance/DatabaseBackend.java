@@ -1630,6 +1630,16 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         return null;
     }
 
+    public void deleteConversation(Conversation conversation) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Pastikan foreign key aktif
+        db.execSQL("PRAGMA foreign_keys=ON;");
+
+        // Hapus percakapan (otomatis akan hapus messages jika foreign key cascade aktif)
+        db.delete("conversations", "uuid = ?", new String[]{conversation.getUuid()});
+    }
+
     public void deleteMessageByUUID(Message message, Conversation conversation) {
         String uuidMsg = message.getUuid();
 

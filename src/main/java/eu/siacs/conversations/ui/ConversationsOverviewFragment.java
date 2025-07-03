@@ -33,6 +33,7 @@ import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -233,6 +234,29 @@ public class ConversationsOverviewFragment extends XmppFragment {
 
     private ItemTouchHelper touchHelper;
 
+    private void showDeleteConversationDialog(Conversation conversation, int position) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Hapus Percakapan")
+                .setMessage("Delete all message and history ?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    deleteConversationCompletely(conversation, position);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void deleteConversationCompletely(Conversation conversation, int position) {
+        this.activity.xmppConnectionService.sendRemoteClearHistory(activity, conversation, () -> {
+            activity.runOnUiThread(() -> {
+                List<Conversation> updatedList = activity
+                        .xmppConnectionService
+                        .getDatabaseBackend()
+                        .getConversations(Conversation.STATUS_AVAILABLE);
+                conversationsAdapter.updateList(updatedList);
+            });
+        });
+    }
+
     public static Conversation getSuggestion(Activity activity) {
         final Conversation exception;
         Fragment fragment = activity.getFragmentManager().findFragmentById(R.id.main_fragment);
@@ -311,22 +335,30 @@ public class ConversationsOverviewFragment extends XmppFragment {
         this.activity = null;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
+
     @Override
     public View onCreateView(
             final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.binding =
-                DataBindingUtil.inflate(
-                        inflater, R.layout.fragment_conversations_overview, container, false);
+
+        this.binding = DataBindingUtil.inflate(
+                inflater, R.layout.fragment_conversations_overview, container, false);
+
         this.binding.fab.setOnClickListener(
                 (view) -> StartConversationActivity.launch(getActivity()));
 
         this.conversationsAdapter = new ConversationAdapter(this.activity, this.conversations);
+
+        this.conversationsAdapter.setOnConversationLongClickListener(
+                (conversation, position) -> showDeleteConversationDialog(conversation, position)
+        );
+
         this.conversationsAdapter.setConversationClickListener(
                 (view, conversation) -> {
                     if (activity instanceof OnConversationSelected) {
@@ -337,12 +369,15 @@ public class ConversationsOverviewFragment extends XmppFragment {
                                 "Activity does not implement OnConversationSelected");
                     }
                 });
+
         this.binding.list.setAdapter(this.conversationsAdapter);
         this.binding.list.setLayoutManager(
                 new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         this.binding.list.addOnScrollListener(ExtendedFabSizeChanger.of(binding.fab));
+
         this.touchHelper = new ItemTouchHelper(this.callback);
         this.touchHelper.attachToRecyclerView(this.binding.list);
+
         return binding.getRoot();
     }
 

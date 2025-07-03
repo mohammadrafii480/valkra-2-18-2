@@ -52,6 +52,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.RemoteInput;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
@@ -6245,6 +6247,7 @@ public class XmppConnectionService extends Service {
     public void clearConversationHistory(final Conversation conversation) {
         final long clearDate;
         final String reference;
+
         if (conversation.countMessages() > 0) {
             Message latestMessage = conversation.getLatestMessage();
             clearDate = latestMessage.getTimeSent() + 1000;
@@ -6253,14 +6256,46 @@ public class XmppConnectionService extends Service {
             clearDate = System.currentTimeMillis();
             reference = null;
         }
+
+        // 1. Secure delete untuk semua file media
+        for (Message message : conversation.getMessageList()) {
+            File file = getFileBackend().getFile(message);
+            if (file != null && file.exists()) {
+                try {
+                    SecureDelete.DeleteFile(file);
+                } catch (IOException e) {
+                    Log.e("SecureDelete", "Gagal hapus file media", e);
+                }
+            }
+
+            evictPreview(message.getUuid());
+        }
+
+        // 2. Hapus pesan dari memori
         conversation.clearMessages();
-        conversation.setHasMessagesLeftOnServer(false); // avoid messages getting loaded through mam
+
+        // 3. Blokir pemuatan ulang dari server (MAM)
+        conversation.setHasMessagesLeftOnServer(false);
+
+        // 4. Simpan titik referensi terakhir penghapusan
         conversation.setLastClearHistory(clearDate, reference);
-        Runnable runnable =
-                () -> {
-                    databaseBackend.deleteMessagesInConversation(conversation);
-                    databaseBackend.updateConversation(conversation);
-                };
+
+        // 5. Hapus dari database secara async
+        Runnable runnable = () -> {
+            Log.d("ConversationClear", "Menghapus semua pesan dalam percakapan: " + conversation.getName());
+            databaseBackend.deleteMessagesInConversation(conversation);
+            Log.d("ConversationClear", "Pesan dihapus.");
+
+            // Cek jumlah pesan tersisa untuk berjaga-jaga
+            if (conversation.countMessages() <= 0) {
+                Log.d("ConversationClear", "Percakapan kosong, menghapus dari database: " + conversation.getName());
+                databaseBackend.deleteConversation(conversation);
+                Log.d("ConversationClear", "Percakapan dihapus.");
+            } else {
+                Log.d("ConversationClear", "Percakapan masih memiliki pesan, tidak dihapus.");
+            }
+        };
+
         mDatabaseWriterExecutor.execute(runnable);
     }
 
@@ -6642,4 +6677,69 @@ public class XmppConnectionService extends Service {
         }
         toggleForegroundService(activity.xmppConnectionService);
     }
+
+    public void sendRemoteClearHistory(@NonNull Context context, final Conversation conversation, @Nullable Runnable onComplete) {
+        final long clearDate;
+        final String reference;
+
+        if (conversation.countMessages() > 0) {
+            Message latestMessage = conversation.getLatestMessage();
+            clearDate = latestMessage.getTimeSent() + 1000;
+            reference = latestMessage.getServerMsgId();
+        } else {
+            clearDate = System.currentTimeMillis();
+            reference = null;
+        }
+
+        for (Message message : conversation.getMessageList()) {
+            File file = getFileBackend().getFile(message);
+            if (file != null && file.exists()) {
+                try {
+                    SecureDelete.DeleteFile(file);
+                } catch (IOException e) {
+                    Log.e("SecureDelete", "Gagal hapus file media", e);
+                }
+            }
+            evictPreview(message.getUuid());
+        }
+
+        conversation.clearMessages();
+        conversation.setHasMessagesLeftOnServer(false);
+        conversation.setLastClearHistory(clearDate, reference);
+
+        Jid to = conversation.getJid();
+        Jid from = conversation.getAccount().getJid();
+        XmppConnection connection = conversation.getAccount().getXmppConnection();
+
+        Element clear = new Element("clear", "urn:xmpp:clear-history:0");
+        clear.setAttribute("timestamp", String.valueOf(System.currentTimeMillis()));
+
+        im.conversations.android.xmpp.model.stanza.Message msg = new im.conversations.android.xmpp.model.stanza.Message();
+        msg.setAttribute("from", from);
+        msg.setAttribute("to", to);
+        msg.setAttribute("type", "chat");
+        msg.setAttribute("id", UUID.randomUUID().toString());
+        msg.addChild(clear);
+
+        Log.d("RemoteClear", "Mengirim stanza <clear> ke: " + to);
+        connection.sendMessagePacket(msg);
+
+        mDatabaseWriterExecutor.execute(() -> {
+            Log.d("ConversationClear", "Menghapus semua pesan dalam percakapan: " + conversation.getName());
+            databaseBackend.deleteMessagesInConversation(conversation);
+            Log.d("ConversationClear", "Pesan dihapus.");
+
+            if (conversation.countMessages() <= 0) {
+                Log.d("ConversationClear", "Percakapan kosong, akan diarsipkan: " + conversation.getName());
+                conversation.setStatus(Conversation.STATUS_ARCHIVED);
+                databaseBackend.updateConversation(conversation);
+                Log.d("ConversationClear", "Percakapan diarsipkan.");
+            }
+
+            if (onComplete != null) {
+                onComplete.run();
+            }
+        });
+    }
+
 }

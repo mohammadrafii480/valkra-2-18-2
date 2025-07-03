@@ -492,6 +492,7 @@ public class MessageParser extends AbstractParser
     public void accept(final im.conversations.android.xmpp.model.stanza.Message original) {
         final var account = connection.getAccount();
 
+        // === HANDLE RETRACT (hapus 1 pesan) ===
         final Element retract = original.findChild("retract", "urn:xmpp:message-retract:0");
         if (retract != null) {
             final String uuid = retract.getAttribute("id");
@@ -508,10 +509,10 @@ public class MessageParser extends AbstractParser
 
                     if (message != null) {
                         Log.d("RemoteDelete", "✅ Pesan ditemukan. Menghapus dari percakapan dan database.");
-                        conversation.clearMessageByUUID(message.getUuid()); // pakai UUID asli dari message
+                        conversation.clearMessageByUUID(message.getUuid());
                         mXmppConnectionService.getDatabaseBackend().deleteMessageByUUID(message, conversation);
                     } else {
-                        Log.w("RemoteDelete", "❌ Pesan tidak ditemukan dengan UUID: " + uuid + " dalam percakapan.");
+                        Log.w("RemoteDelete", "❌ Pesan tidak ditemukan dengan UUID: " + uuid);
                     }
 
                     mXmppConnectionService.evictPreview(uuid);
@@ -522,6 +523,29 @@ public class MessageParser extends AbstractParser
                 }
             } else {
                 Log.w("RemoteDelete", "❌ UUID tidak ditemukan dalam tag <retract>");
+            }
+            return;
+        }
+
+        // === HANDLE CLEAR (hapus seluruh riwayat percakapan) ===
+        final Element clear = original.findChild("clear", "urn:xmpp:clear-history:0");
+        if (clear != null) {
+            final Jid sender = original.getFrom();
+            Log.d("RemoteClear", "📩 Menerima perintah clear dari: " + sender);
+            final Conversation conversation = mXmppConnectionService.find(account, sender.asBareJid());
+
+            if (conversation != null) {
+                Log.d("RemoteClear", "✅ Percakapan ditemukan. Menghapus semua pesan...");
+                mXmppConnectionService.clearConversationHistory(conversation);
+
+                // Tandai sebagai diarsipkan agar tersembunyi dari UI
+                conversation.setStatus(Conversation.STATUS_ARCHIVED);
+                mXmppConnectionService.getDatabaseBackend().updateConversation(conversation);
+
+                mXmppConnectionService.updateConversationUi();
+                Log.d("RemoteClear", "✅ Clear & arsip selesai untuk: " + sender);
+            } else {
+                Log.w("RemoteClear", "❌ Percakapan tidak ditemukan untuk: " + sender.asBareJid());
             }
             return;
         }

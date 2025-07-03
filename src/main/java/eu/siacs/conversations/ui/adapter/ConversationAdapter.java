@@ -198,6 +198,13 @@ public class ConversationAdapter
             } else {
                 viewHolder.binding.senderName.setVisibility(View.GONE);
             }
+
+            viewHolder.itemView.setOnLongClickListener(v -> {
+                if (longClickListener != null) {
+                    longClickListener.onConversationLongPressed(conversation, position);
+                }
+                return true;
+            });
         }
 
         final Optional<OngoingRtpSession> ongoingCall;
@@ -284,4 +291,22 @@ public class ConversationAdapter
             this.binding = binding;
         }
     }
+
+    public interface OnConversationLongClickListener {
+        void onConversationLongPressed(Conversation conversation, int position);
+    }
+
+    private OnConversationLongClickListener longClickListener;
+
+    public void setOnConversationLongClickListener(OnConversationLongClickListener listener) {
+        this.longClickListener = listener;
+    }
+
+    public void updateList(List<Conversation> newList) {
+        conversations.clear();
+        conversations.addAll(newList);
+        notifyDataSetChanged();
+    }
+
+
 }
