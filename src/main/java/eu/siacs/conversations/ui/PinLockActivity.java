@@ -37,6 +37,7 @@ public class PinLockActivity extends AppCompatActivity {
 
         for (int i = 0; i < keypad.getChildCount(); i++) {
             Button btn = (Button) keypad.getChildAt(i);
+            if (btn == null || btn.getText() == null) continue;
             String text = btn.getText().toString();
 
             btn.setOnClickListener(v -> {
@@ -81,7 +82,8 @@ public class PinLockActivity extends AppCompatActivity {
 
         if (savedPin != null && enteredPin.equals(savedPin)) {
             prefs.edit().putBoolean("pin_verified", true).apply();
-            finish(); // PIN benar
+            setResult(RESULT_OK); // Tambahkan ini agar ConversationsActivity tahu PIN sudah benar
+            finish();
         } else {
             Toast.makeText(this, "PIN salah", Toast.LENGTH_SHORT).show();
             pinBuilder.setLength(0);

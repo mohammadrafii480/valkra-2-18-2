@@ -13,14 +13,26 @@ import com.google.android.material.color.DynamicColorsOptions;
 
 import eu.siacs.conversations.services.EmojiInitializationService;
 import eu.siacs.conversations.utils.ExceptionHelper;
+import android.app.Activity;
+import android.os.Bundle;
 
 public class Conversations extends Application {
 
     @SuppressLint("StaticFieldLeak")
     private static Context CONTEXT;
 
+    private static boolean isInBackground = false;
+
     public static Context getContext() {
         return Conversations.CONTEXT;
+    }
+
+    public static boolean isInBackground() {
+        return isInBackground;
+    }
+
+    public static void setInBackground(boolean value) {
+        isInBackground = value;
     }
 
     @Override
@@ -30,6 +42,29 @@ public class Conversations extends Application {
         EmojiInitializationService.execute(getApplicationContext());
         ExceptionHelper.init(getApplicationContext());
         applyThemeSettings();
+
+        // Tambahkan lifecycle listener untuk pantau background/foreground
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityResumed(Activity activity) {
+                setInBackground(false);
+            }
+
+            @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
+            @Override public void onActivityStarted(Activity activity) {}
+            @Override public void onActivityPaused(Activity activity) {}
+            @Override public void onActivityStopped(Activity activity) {}
+            @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+            @Override public void onActivityDestroyed(Activity activity) {}
+        });
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level == TRIM_MEMORY_UI_HIDDEN) {
+            setInBackground(true);
+        }
     }
 
     public void applyThemeSettings() {
