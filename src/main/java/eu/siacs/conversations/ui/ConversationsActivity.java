@@ -650,7 +650,7 @@ public class ConversationsActivity extends XmppActivity
         long lastPausedTime = prefs.getLong("last_paused_time", 0);
         long now = SystemClock.elapsedRealtime();
 
-        boolean shouldAskPin = (now - lastPausedTime > 5000); // 5 detik
+        boolean shouldAskPin = (now - lastPausedTime > 60000); // 1 menit
         boolean isPinRequired = prefs.getString("protected_pin", null) != null;
         boolean isPinVerified = prefs.getBoolean("pin_verified", false);
 
