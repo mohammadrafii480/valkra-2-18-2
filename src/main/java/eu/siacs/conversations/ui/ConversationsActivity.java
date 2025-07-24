@@ -609,12 +609,18 @@ public class ConversationsActivity extends XmppActivity
     @Override
     protected void onStop() {
         super.onStop();
-        getSharedPreferences("garkom_prefs", MODE_PRIVATE)
-                .edit()
-                .putBoolean("pin_verified", false)
-                .apply();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isFinishing()) {
+            getSharedPreferences("garkom_prefs", MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("pin_verified", false)
+                    .apply();
+        }
+    }
 
     @Override
     protected void onNewIntent(final Intent intent) {
@@ -650,14 +656,19 @@ public class ConversationsActivity extends XmppActivity
         long lastPausedTime = prefs.getLong("last_paused_time", 0);
         long now = SystemClock.elapsedRealtime();
 
-        boolean shouldAskPin = (now - lastPausedTime > 60000); // 1 menit
+        boolean shouldAskPin = (now - lastPausedTime > 0); // 1 menit
         boolean isPinRequired = prefs.getString("protected_pin", null) != null;
         boolean isPinVerified = prefs.getBoolean("pin_verified", false);
 
         if (isPinRequired && shouldAskPin && !isPinVerified && !PinLockActivity.class.isAssignableFrom(getClass())) {
+            Log.d("GARKOM_PIN", "Launching PinLockActivity");
             Intent intent = new Intent(this, PinLockActivity.class);
             startActivityForResult(intent, PIN_REQUEST_CODE);
         }
+
+        Log.d("GARKOM_PIN", "onResume triggered");
+        Log.d("GARKOM_PIN", "lastPaused=" + lastPausedTime + ", now=" + now + ", delta=" + (now - lastPausedTime));
+        Log.d("GARKOM_PIN", "isPinRequired=" + isPinRequired + ", isPinVerified=" + isPinVerified + ", shouldAskPin=" + shouldAskPin);
     }
 
     @Override
