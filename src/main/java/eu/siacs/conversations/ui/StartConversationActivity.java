@@ -56,8 +56,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.gson.JsonObject;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import eu.siacs.conversations.BuildConfig;
 import eu.siacs.conversations.Config;
 import eu.siacs.conversations.R;
@@ -68,9 +73,12 @@ import eu.siacs.conversations.entities.Contact;
 import eu.siacs.conversations.entities.Conversation;
 import eu.siacs.conversations.entities.ListItem;
 import eu.siacs.conversations.entities.MucOptions;
+import eu.siacs.conversations.http.services.ApiServer;
+import eu.siacs.conversations.http.services.ApiService;
 import eu.siacs.conversations.services.QuickConversationsService;
 import eu.siacs.conversations.services.XmppConnectionService;
 import eu.siacs.conversations.services.XmppConnectionService.OnRosterUpdate;
+import eu.siacs.conversations.session.SessionManager;
 import eu.siacs.conversations.ui.adapter.ListItemAdapter;
 import eu.siacs.conversations.ui.interfaces.OnBackendConnected;
 import eu.siacs.conversations.ui.util.JidDialog;
@@ -84,6 +92,12 @@ import eu.siacs.conversations.xmpp.Jid;
 import eu.siacs.conversations.xmpp.OnUpdateBlocklist;
 import eu.siacs.conversations.xmpp.XmppConnection;
 import im.conversations.android.xmpp.model.stanza.Presence;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,7 +116,7 @@ public class StartConversationActivity extends XmppActivity
             "contact_list_integration_consent";
 
     public static final String EXTRA_INVITE_URI = "eu.siacs.conversations.invite_uri";
-
+    private SessionManager sessions;
     private final int REQUEST_SYNC_CONTACTS = 0x28cf;
     private final int REQUEST_CREATE_CONFERENCE = 0x39da;
     private final PendingItem<Intent> pendingViewIntent = new PendingItem<>();
@@ -294,6 +308,8 @@ public class StartConversationActivity extends XmppActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessions = new SessionManager(this);
+        Log.d("SessionDebug", "JabberID = " + sessions.getJabberID());
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_start_conversation);
         Activities.setStatusAndNavigationBarColors(this, binding.getRoot());
         setSupportActionBar(binding.toolbar);
@@ -378,7 +394,7 @@ public class StartConversationActivity extends XmppActivity
 //                            showPublicChannelDialog();
 //                            break;
                         case R.id.create_contact:
-                            showCreateContactDialog(prefilled, null);
+                            checkAddContactPermissionAndShowDialog(prefilled, null);
                             break;
                     }
                     return false;
@@ -600,6 +616,68 @@ public class StartConversationActivity extends XmppActivity
                     filter(mSearchEditText.getText().toString());
                 });
         builder.create().show();
+    }
+
+    private void checkAddContactPermissionAndShowDialog(@Nullable String prefilledJid, @Nullable Invite invite) {
+        String rawJid = sessions.getJabberID(); // contoh: rafridiansyah7_at_gmail.com@vac.m.valkra.net
+        String email;
+
+        if (rawJid == null || rawJid.isEmpty()) {
+            Toast.makeText(this, "Email tidak ditemukan", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Ambil bagian local dari JID dan ubah _at_ menjadi @
+        String localPart = rawJid.split("@")[0]; // rafridiansyah7_at_gmail.com
+        email = localPart.replace("_at_", "@");  // rafridiansyah7@gmail.com
+
+        String appCode = "VACVALKRA";
+
+        Log.d("DEBUG_API", "Email: " + email);  // Debug log
+        Log.d("DEBUG_API", "JabberID: " + rawJid);
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("emailAddress", email);
+            json.put("appCode", appCode);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Gagal membuat JSON request", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        RequestBody requestBody = RequestBody.create(
+                MediaType.parse("application/json"),
+                json.toString()
+        );
+
+        ApiService api = ApiServer.getAPIService();
+        api.getAddContact(requestBody).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        JsonObject data = response.body().getAsJsonObject("data"); // ambil objek data
+                        boolean canAddContact = data.get("addContact").getAsBoolean(); // ambil addContact
+
+                        if (canAddContact) {
+                            showCreateContactDialog(prefilledJid, invite);
+                        } else {
+                            Toast.makeText(StartConversationActivity.this, "Anda tidak memiliki izin untuk menambah kontak", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(StartConversationActivity.this, "Format respons server tidak sesuai", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(StartConversationActivity.this, "Gagal mengecek izin dari server", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(StartConversationActivity.this, "Koneksi gagal: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @SuppressLint("InflateParams")
@@ -1087,7 +1165,7 @@ public class StartConversationActivity extends XmppActivity
                 return false;
             }
         } else if (contacts.isEmpty()) {
-            showCreateContactDialog(invite.getJid().toString(), invite);
+            checkAddContactPermissionAndShowDialog(invite.getJid().toString(), invite);
             return false;
         } else if (contacts.size() == 1) {
             Contact contact = contacts.get(0);

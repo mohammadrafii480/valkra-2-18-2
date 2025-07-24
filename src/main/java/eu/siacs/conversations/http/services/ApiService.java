@@ -31,4 +31,7 @@ public interface ApiService {
     Call<JsonObject> UnregisterAccount(@Query("email") String email,
                                        @Query("appCode") String appCode,
                                        @Header("Authorization") String authHeader);
+
+    @POST("api/v1/user/get-add-contact")
+    Call<JsonObject> getAddContact(@Body RequestBody body);
 }
