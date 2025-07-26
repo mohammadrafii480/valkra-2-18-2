@@ -141,7 +141,7 @@ public class EditAccountActivity extends OmemoActivity
     private boolean mUsernameMode = false;
     private boolean mShowOptions = false;
     private Account mAccount;
-
+    private static final int REQUEST_CODE_SET_PIN = 101;
     private String appName;
     private Context mContext;
 
@@ -445,6 +445,10 @@ public class EditAccountActivity extends OmemoActivity
             } else {
                 Log.d(Config.LOGTAG, "pgp result not ok");
             }
+        }
+        if (requestCode == REQUEST_CODE_SET_PIN && resultCode == RESULT_OK) {
+            Log.d("PIN", "PIN baru disimpan, refresh menu");
+            invalidateOptionsMenu(); // ← ini akan memanggil ulang onCreateOptionsMenu()
         }
     }
 
@@ -1059,7 +1063,7 @@ public class EditAccountActivity extends OmemoActivity
 
                 if (currentPin == null) {
                     Toast.makeText(this, "Silakan atur PIN terlebih dahulu", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this, SetPinActivity.class));
+                    startActivityForResult(new Intent(this, SetPinActivity.class), REQUEST_CODE_SET_PIN);
                 } else {
                     boolean currentState = item.isChecked();
                     item.setChecked(!currentState);

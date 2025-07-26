@@ -66,11 +66,19 @@ public class SetPinActivity extends AppCompatActivity {
             }
 
             SharedPreferences prefs = getSharedPreferences("garkom_prefs", MODE_PRIVATE);
-            prefs.edit().putString("protected_pin", pinBuilder.toString()).apply();
+            prefs.edit()
+                    .putString("protected_pin", pinBuilder.toString())
+                    .putBoolean("protected_pin_enabled", true) // ← aktifkan langsung
+                    .apply();
 
-            Toast.makeText(this, "PIN berhasil disimpan", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "PIN berhasil disimpan dan langsung diaktifkan", Toast.LENGTH_SHORT).show();
+
+            // Paksa update menu jika kamu kembali ke activity sebelumnya
+            setResult(RESULT_OK); // supaya activity sebelumnya bisa tahu PIN diset
+
             finish();
         });
+
     }
 
     private void updatePinDisplay() {
