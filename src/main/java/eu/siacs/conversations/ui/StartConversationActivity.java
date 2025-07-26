@@ -838,27 +838,43 @@ public class StartConversationActivity extends XmppActivity
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.start_conversation, menu);
         AccountUtils.showHideMenuItems(menu);
+        // Menu items
         final MenuItem menuHideOffline = menu.findItem(R.id.action_hide_offline);
         final MenuItem qrCodeScanMenuItem = menu.findItem(R.id.action_scan_qr_code);
         final MenuItem qrCodeShowMenuItem = menu.findItem(R.id.action_show_qr_code);
-        qrCodeShowMenuItem.setVisible(true);
         final MenuItem privacyPolicyMenuItem = menu.findItem(R.id.action_privacy_policy);
-        privacyPolicyMenuItem.setVisible(
-                BuildConfig.PRIVACY_POLICY != null
-                        && QuickConversationsService.isPlayStoreFlavor());
-        qrCodeScanMenuItem.setVisible(isCameraFeatureAvailable());
-        if (QuickConversationsService.isQuicksy()) {
-            menuHideOffline.setVisible(false);
-        } else {
-            menuHideOffline.setVisible(true);
-            menuHideOffline.setChecked(this.mHideOfflineContacts);
+        // Tampilkan QR Code (kamu set visible true)
+        if (qrCodeShowMenuItem != null) {
+            qrCodeShowMenuItem.setVisible(true);
         }
+        // Tampilkan scan QR jika kamera tersedia
+        if (qrCodeScanMenuItem != null) {
+            qrCodeScanMenuItem.setVisible(isCameraFeatureAvailable());
+        }
+        // Privacy policy visibility
+        if (privacyPolicyMenuItem != null) {
+            boolean visible = BuildConfig.PRIVACY_POLICY != null && QuickConversationsService.isPlayStoreFlavor();
+            privacyPolicyMenuItem.setVisible(visible);
+        }
+        // Hide offline contacts toggle
+        if (QuickConversationsService.isQuicksy()) {
+            if (menuHideOffline != null) menuHideOffline.setVisible(false);
+        } else {
+            if (menuHideOffline != null) {
+                menuHideOffline.setVisible(true);
+                menuHideOffline.setChecked(this.mHideOfflineContacts);
+            }
+        }
+        // Search bar
         mMenuSearchView = menu.findItem(R.id.action_search);
-        mMenuSearchView.setOnActionExpandListener(mOnActionExpandListener);
-        View mSearchView = mMenuSearchView.getActionView();
-        mSearchEditText = mSearchView.findViewById(R.id.search_field);
-        mSearchEditText.addTextChangedListener(mSearchTextWatcher);
-        mSearchEditText.setOnEditorActionListener(mSearchDone);
+        if (mMenuSearchView != null) {
+            mMenuSearchView.setOnActionExpandListener(mOnActionExpandListener);
+            View mSearchView = mMenuSearchView.getActionView();
+            mSearchEditText = mSearchView.findViewById(R.id.search_field);
+            mSearchEditText.addTextChangedListener(mSearchTextWatcher);
+            mSearchEditText.setOnEditorActionListener(mSearchDone);
+        }
+        // Initial search (optional if ada)
         String initialSearchValue = mInitialSearchValue.pop();
         if (initialSearchValue != null) {
             mMenuSearchView.expandActionView();
@@ -874,13 +890,16 @@ public class StartConversationActivity extends XmppActivity
         if (MenuDoubleTabUtil.shouldIgnoreTap()) {
             return false;
         }
+
         switch (item.getItemId()) {
             case android.R.id.home:
                 navigateBack();
                 return true;
+
             case R.id.action_scan_qr_code:
                 UriHandlerActivity.scan(this);
                 return true;
+
             case R.id.action_hide_offline:
                 mHideOfflineContacts = !item.isChecked();
                 getPreferences().edit().putBoolean("hide_offline", mHideOfflineContacts).apply();
@@ -889,13 +908,31 @@ public class StartConversationActivity extends XmppActivity
                 }
                 invalidateOptionsMenu();
                 return true;
+
             case R.id.action_show_qr_code:
-                Intent intent = new Intent(this, ShowQrCodeActivity.class);
-                List<Account> accounts = xmppConnectionService.getAccounts();
-                if (!accounts.isEmpty()) {
-                    intent.putExtra("jid", accounts.get(0).getJid().asBareJid().toString());
+                if (xmppConnectionService != null) {
+                    List<Account> accounts = xmppConnectionService.getAccounts();
+                    Account activeAccount = null;
+
+                    // Cari akun yang aktif (enabled)
+                    for (Account acc : accounts) {
+                        if (acc != null && acc.isEnabled()) {
+                            activeAccount = acc;
+                            break;
+                        }
+                    }
+
+                    // Jika ketemu akun aktif, kirim ke QR activity
+                    if (activeAccount != null) {
+                        Intent qrIntent = new Intent(this, ShowQrCodeActivity.class);
+                        qrIntent.putExtra("jid", activeAccount.getJid().asBareJid().toString());
+                        startActivity(qrIntent);
+                    } else {
+                        Toast.makeText(this, "Tidak ada akun aktif yang ditemukan", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Layanan belum siap", Toast.LENGTH_SHORT).show();
                 }
-                startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

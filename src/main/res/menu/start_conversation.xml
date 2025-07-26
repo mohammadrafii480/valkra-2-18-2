@@ -9,6 +9,12 @@
         app:actionLayout="@layout/actionview_search"
         app:showAsAction="collapseActionView|always" />
     <item
+        android:id="@+id/action_show_qr_code"
+        android:icon="@drawable/ic_qr_code_24dp"
+        android:orderInCategory="9"
+        android:title="@string/show_qr_code"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_scan_qr_code"
         android:icon="@drawable/ic_qr_code_scanner_24dp"
         android:title="@string/scan_qr_code"
@@ -36,11 +42,6 @@
         android:orderInCategory="98"
         android:title="@string/privacy_policy"
         android:visible="false"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_show_qr_code"
-        android:title="Show QR Code"
-        android:orderInCategory="99"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"

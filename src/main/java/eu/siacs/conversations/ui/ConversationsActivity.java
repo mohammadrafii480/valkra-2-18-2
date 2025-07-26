@@ -442,10 +442,11 @@ public class ConversationsActivity extends XmppActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_conversations, menu);
+        Fragment fragment = getFragmentManager().findFragmentById(R.id.main_fragment);
+        // Atur visibilitas tombol Scan QR Code
         final MenuItem qrCodeScanMenuItem = menu.findItem(R.id.action_scan_qr_code);
         if (qrCodeScanMenuItem != null) {
             if (isCameraFeatureAvailable()) {
-                Fragment fragment = getFragmentManager().findFragmentById(R.id.main_fragment);
                 boolean visible =
                         getResources().getBoolean(R.bool.show_qr_code_scan)
                                 && fragment instanceof ConversationsOverviewFragment;
@@ -453,6 +454,12 @@ public class ConversationsActivity extends XmppActivity
             } else {
                 qrCodeScanMenuItem.setVisible(false);
             }
+        }
+        // 🔧 Atur visibilitas tombol Show QR Code
+        final MenuItem showQrMenuItem = menu.findItem(R.id.action_show_qr_code);
+        if (showQrMenuItem != null) {
+            boolean visible = fragment instanceof ConversationsOverviewFragment;
+            showQrMenuItem.setVisible(visible);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -575,6 +582,30 @@ public class ConversationsActivity extends XmppActivity
                 final Intent intent = new Intent(this, SearchActivity.class);
                 intent.putExtra(SearchActivity.EXTRA_CONVERSATION_UUID, conversation.getUuid());
                 startActivity(intent);
+                return true;
+            case R.id.action_show_qr_code:
+                if (xmppConnectionService != null) {
+                    Log.d(Config.LOGTAG, "XmppConnectionService is not null");
+
+                    List<Account> accounts = xmppConnectionService.getAccounts();
+                    Log.d(Config.LOGTAG, "Jumlah akun ditemukan: " + accounts.size());
+
+                    if (!accounts.isEmpty()) {
+                        Account account = accounts.get(0);
+                        String jid = account.getJid().asBareJid().toString();
+                        Log.d(Config.LOGTAG, "JID akun pertama: " + jid);
+
+                        Intent qrIntent = new Intent(this, ShowQrCodeActivity.class);
+                        qrIntent.putExtra("jid", jid);
+                        startActivity(qrIntent);
+                    } else {
+                        Log.w(Config.LOGTAG, "Tidak ada akun yang tersedia");
+                        Toast.makeText(this, "Tidak ada akun yang tersedia", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.w(Config.LOGTAG, "XmppConnectionService is null");
+                    Toast.makeText(this, "Layanan belum siap", Toast.LENGTH_SHORT).show();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);

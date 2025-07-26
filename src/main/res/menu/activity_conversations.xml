@@ -16,6 +16,12 @@
         </menu>
     </item>
     <item
+        android:id="@+id/action_show_qr_code"
+        android:icon="@drawable/ic_qr_code_24dp"
+        android:orderInCategory="9"
+        android:title="@string/show_qr_code"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_scan_qr_code"
         android:icon="@drawable/ic_qr_code_scanner_24dp"
         android:orderInCategory="10"
